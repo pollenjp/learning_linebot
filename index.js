@@ -23,7 +23,7 @@ const app = express();
 app.post("/webhook", line.middleware(config),
   function(req, res)
   {
-    Promis
+    Promise
       .all(req.body.events.map(handleEvent))
       .then(function(result){ res.json(result); });
   }
@@ -38,9 +38,9 @@ function handleEvent(event)
     return Promise.resolve(null);
   }
 
-  // replay echo
+  // reply echo
   const echo = { type: "text", text: event.message.text };
-  return client.replayMessage(event.replayToken, echo);
+  return client.replyMessage(event.replyToken, echo);
 }
 
 
