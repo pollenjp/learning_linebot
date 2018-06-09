@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node your-script.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,5 @@
   "bugs": {
     "url": "https://github.com/pollenjp/learning_linebot/issues"
   },
-  "homepage": "https://github.com/pollenjp/learning_linebot#readme"
+  "homepage": "https://github.com/pollenjp/learning_linebot#readme",
 }
