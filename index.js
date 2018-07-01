@@ -26,6 +26,7 @@ const app = express();
 app.post("/webhook", line.middleware(config),
   function(req, res)
   {
+    console.log("get");
     Promise
       .all(req.body.events.map(handleEvent))
       .then(function(result){ res.json(result); });
@@ -39,18 +40,22 @@ app.post("/webhook", line.middleware(config),
 const client = new line.Client(config);
 function handleEvent(event)
 {
-  if (event.type !== "message" || event.message.type !== "text"){
-    // ignore non-text-message event
-    return Promise.resolve(null);
-  }
+  console.log(event.type);
+  console.log(event.timestamp);
+  console.log(event.source);
+  //if (event.type !== "message" || event.message.type !== "text"){
+  //  // ignore non-text-message event
+  //  return Promise.resolve(null);
+  //}
 
   //----------------------------------------
   // reply
   //----------------------------------------
+  var reply;
   //--------------------
   //  type : message
   //--------------------
-  //if (event.type == "message" && event.message.type == "text"){
+  if (event.type == "message" && event.message.type == "text"){
     //----------
     //  Text Message
     //----------
@@ -63,12 +68,13 @@ function handleEvent(event)
     //----------
     //  Button Template Message
     //----------
-    const reply = {  // Button Template Message
+    reply = {  // Button Template Message
       "type": "template",
       "altText": "This is a buttons template",
       "template": {
         "type": "buttons",
         //"thumbnailImageUrl": "http://openweathermap.org/img/w/01d.png",
+        //"thumbnailImageUrl": "./image/umbrella01.gif",
         "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
         "imageAspectRatio": "rectangle",
         "imageSize": "cover",
@@ -83,35 +89,27 @@ function handleEvent(event)
         "actions": [
           {
             "type": "postback",
-            "label": "Buy",
-            "data": "action=buy&itemid=123"
+            "label": "Yes",
+            "data": "action=yes"
           },
           {
             "type": "postback",
-            "label": "Add to cart",
-            "data": "action=add&itemid=123"
-          },
-          {
-            "type": "uri",
-            "label": "View detail",
-            "uri": "http://example.com/page/123"
+            "label": "No",
+            "data": "action=no"
           }
         ]
       }
     };
-  //}
+  }
   //--------------------
   //  type : postback
   //--------------------
-  //if (event.type == "postback"){
-  //  const reply = {};
-  //  console.log("event:postback");
-  //  console.log(event);
-  //  reply = {  // Text Message
-  //    type: "text",
-  //    text: "event:postback"
-  //  };
-  //}
+  if (event.type == "postback"){
+    reply = {  // Text Message
+      type: "text",
+      text: "event:postback"
+    };
+  }
 
   return client.replyMessage(event.replyToken, reply);
 }
