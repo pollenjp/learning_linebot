@@ -68,6 +68,7 @@ function getWeatherInfo(){
       {
         city_name : data.city.name,
         forecast  : data.list[i].weather[0].main,
+        icon      : data.list[i].weather[0].icon,
         date      : day,
         time      : time
       }
