@@ -50,7 +50,7 @@ function handleEvent(event)
   //--------------------
   //  type : message
   //--------------------
-  if (event.type !== "message" || event.message.type !== "text"){
+  //if (event.type == "message" && event.message.type == "text"){
     //----------
     //  Text Message
     //----------
@@ -68,7 +68,8 @@ function handleEvent(event)
       "altText": "This is a buttons template",
       "template": {
         "type": "buttons",
-        "thumbnailImageUrl": "http://openweathermap.org/img/w/01d.png",
+        //"thumbnailImageUrl": "http://openweathermap.org/img/w/01d.png",
+        "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
         "imageAspectRatio": "rectangle",
         "imageSize": "cover",
         "imageBackgroundColor": "#FFFFFF",  // white
@@ -98,14 +99,19 @@ function handleEvent(event)
         ]
       }
     };
-  }
+  //}
   //--------------------
   //  type : postback
   //--------------------
-  if (event.type == "postback"){
-    console.log("event:postback");
-    console.log(event);
-  }
+  //if (event.type == "postback"){
+  //  const reply = {};
+  //  console.log("event:postback");
+  //  console.log(event);
+  //  reply = {  // Text Message
+  //    type: "text",
+  //    text: "event:postback"
+  //  };
+  //}
 
   return client.replyMessage(event.replyToken, reply);
 }
