@@ -7,7 +7,7 @@ const express = require('express');
 const line = require('@line/bot-sdk');
 require('dotenv').load();               // require and load dotenv
 
-var getWeather = require("./openWeatherAPI/getWeatherInfo_sync.js");
+var getWeather = require("./openWeatherMap/getWeatherInfo_sync.js");
 
 
 //--------------------
@@ -92,8 +92,9 @@ function replyToMessageEvent(event)
     "template": {
       "type": "buttons",
       //"thumbnailImageUrl": "http://openweathermap.org/img/w/01d.png",
-      //"thumbnailImageUrl": "./image/umbrella01.gif",
-      "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+      "thumbnailImageUrl":
+        "https://raw.githubusercontent.com/pollenjp/learning_linebot/feature/line-sdk/image/umbrella01.gif",
+      //"thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
       "imageAspectRatio": "rectangle",
       "imageSize": "cover",
       "imageBackgroundColor": "#FFFFFF",  // white
@@ -124,17 +125,29 @@ function replyToMessageEvent(event)
 //------------------------------------------------------------
 function replyToPostbackEvent(event)
 {
-  var postbackData_obj = queryStringToJSON(event.postback.data);
-  console.log(postbackData_obj);
-  var reply = {
-    type: "text",
-    text: "event:postback"
-  };
+  var postback_data_obj = queryStringToJSON(event.postback.data);
+  console.log(postback_data_obj);
+  var reply;
+  switch (postback_data_obj.question){
+    case "needUmbrella":
+      var weatherInfo = getWeather.getWeatherInfo();
+      reply = {
+        type: "text",
+        text: weatherInfo[0].city_name
+      };
+      break;
+    default:
+      reply = {
+        type: "text",
+        text: "event:postback"
+      };
+  }
   return reply;
 }
 
 
-//------------------------------------------------------------
+//--------------------------------------------------------------------------------
+//  queryStringToJSON
 function queryStringToJSON(qs) {
   // reference
   //    Carlo G
