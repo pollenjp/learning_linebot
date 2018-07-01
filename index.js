@@ -42,14 +42,14 @@ function handleEvent(event)
   }
 
   //--------------------
-  // reply echo
+  // reply
   var weatherInfo = getWeather.getWeatherInfo();
   console.log(weatherInfo);
-  const echo = {
+  const reply = {
     type: "text",
-    text: weatherInfo
+    text: weatherInfo[0].city_name
   };
-  return client.replyMessage(event.replyToken, echo);
+  return client.replyMessage(event.replyToken, reply);
 }
 
 
