@@ -1,8 +1,8 @@
 // index.js
 
-//------------------------------------------------------------
+//--------------------
 //  Require
-//------------------------------------------------------------
+//--------------------
 const express = require('express');
 const line = require('@line/bot-sdk');
 require('dotenv').load();               // require and load dotenv
@@ -10,18 +10,18 @@ require('dotenv').load();               // require and load dotenv
 var getWeather = require("./openWeatherAPI/getWeatherInfo_sync.js");
 
 
-//------------------------------------------------------------
-//  KEY
-//------------------------------------------------------------
+//--------------------
+//  config
+//--------------------
 const config = {
-  channelAccessToken: process.env.MY_CHANNEL_ACCESS_TOKEN,  // .env
-  channelSecret:      process.env.MY_CHANNEL_SECRET         // .env
+  channelAccessToken : process.env.MY_CHANNEL_ACCESS_TOKEN,  // .env
+  channelSecret      : process.env.MY_CHANNEL_SECRET         // .env
 }
 
 
-//------------------------------------------------------------
-//  app
-//------------------------------------------------------------
+//--------------------------------------------------------------------------------
+//  Main
+//--------------------------------------------------------------------------------
 const app = express();
 app.post("/webhook", line.middleware(config),
   function(req, res)
@@ -33,6 +33,9 @@ app.post("/webhook", line.middleware(config),
 );
 
 
+
+//--------------------
+//  handleEvent
 const client = new line.Client(config);
 function handleEvent(event)
 {
@@ -43,11 +46,54 @@ function handleEvent(event)
 
   //--------------------
   // reply
-  var weatherInfo = getWeather.getWeatherInfo();
-  console.log(weatherInfo);
-  const reply = {
-    type: "text",
-    text: weatherInfo[0].city_name
+  //--------------------
+  //
+  //----------
+  //  Text Message
+  //----------
+  //var weatherInfo = getWeather.getWeatherInfo();
+  //console.log(weatherInfo);
+  //const reply = {  // Text Message
+  //  type: "text",
+  //  text: weatherInfo[0].city_name
+  //};
+  //----------
+  //  Button Template Message
+  //----------
+  const reply = {  // Button Template Message
+    "type": "template",
+    "altText": "This is a buttons template",
+    "template": {
+      "type": "buttons",
+      "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+      "imageAspectRatio": "rectangle",
+      "imageSize": "cover",
+      "imageBackgroundColor": "#FFFFFF",
+      "title": "Menu",
+      "text": "Please select",
+      "defaultAction": {
+        "type": "uri",
+        "label": "View detail",
+        "uri": "http://example.com/page/123"
+      },
+      "actions": [
+        {
+          "type": "postback",
+          "label": "Buy",
+          "data": "action=buy&itemid=123"
+        },
+        {
+          "type": "postback",
+          "label": "Add to cart",
+          "data": "action=add&itemid=123"
+        },
+        {
+          "type": "uri",
+          "label": "View detail",
+          "uri": "http://example.com/page/123"
+        }
+      ]
+    }
   };
   return client.replyMessage(event.replyToken, reply);
 }
