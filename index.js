@@ -23,6 +23,8 @@ const config = {
 //  Main
 //--------------------------------------------------------------------------------
 const app = express();
+const client = new line.Client(config);
+
 app.post("/webhook", line.middleware(config),
   function(req, res)
   {
@@ -34,12 +36,11 @@ app.post("/webhook", line.middleware(config),
 );
 
 
-
-//--------------------
+//------------------------------------------------------------
 //  handleEvent
-const client = new line.Client(config);
 function handleEvent(event)
 {
+  console.log(event);
   console.log(event.type);
   console.log(event.timestamp);
   console.log(event.source);
@@ -56,59 +57,13 @@ function handleEvent(event)
   //  type : message
   //--------------------
   if (event.type == "message" && event.message.type == "text"){
-    //----------
-    //  Text Message
-    //----------
-    //var weatherInfo = getWeather.getWeatherInfo();
-    //console.log(weatherInfo);
-    //const reply = {  // Text Message
-    //  type: "text",
-    //  text: weatherInfo[0].city_name
-    //};
-    //----------
-    //  Button Template Message
-    //----------
-    reply = {  // Button Template Message
-      "type": "template",
-      "altText": "This is a buttons template",
-      "template": {
-        "type": "buttons",
-        //"thumbnailImageUrl": "http://openweathermap.org/img/w/01d.png",
-        //"thumbnailImageUrl": "./image/umbrella01.gif",
-        "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-        "imageAspectRatio": "rectangle",
-        "imageSize": "cover",
-        "imageBackgroundColor": "#FFFFFF",  // white
-        "title": "傘の有無を調べますか？",
-        "text": "選択してください。",
-        "defaultAction": {
-          "type": "uri",
-          "label": "View detail",
-          "uri": "http://example.com/page/123"
-        },
-        "actions": [
-          {
-            "type": "postback",
-            "label": "Yes",
-            "data": "action=yes"
-          },
-          {
-            "type": "postback",
-            "label": "No",
-            "data": "action=no"
-          }
-        ]
-      }
-    };
+    reply = replyToMessageEvent(event);
   }
   //--------------------
   //  type : postback
   //--------------------
   if (event.type == "postback"){
-    reply = {  // Text Message
-      type: "text",
-      text: "event:postback"
-    };
+    reply = replyToPostbackEvent(event);
   }
 
   return client.replyMessage(event.replyToken, reply);
@@ -116,8 +71,73 @@ function handleEvent(event)
 
 
 //------------------------------------------------------------
-//  Listen Port
+//  replyToMessageEvent
+function replyToMessageEvent(event)
+{
+  //----------
+  //  reply : Text Message
+  //----------
+  //var weatherInfo = getWeather.getWeatherInfo();
+  //console.log(weatherInfo);
+  //const reply = {  // Text Message
+  //  type: "text",
+  //  text: weatherInfo[0].city_name
+  //};
+  //----------
+  //  reply : Button Template Message
+  //----------
+  var reply = {  // Button Template Message
+    "type": "template",
+    "altText": "This is a buttons template",
+    "template": {
+      "type": "buttons",
+      //"thumbnailImageUrl": "http://openweathermap.org/img/w/01d.png",
+      //"thumbnailImageUrl": "./image/umbrella01.gif",
+      "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+      "imageAspectRatio": "rectangle",
+      "imageSize": "cover",
+      "imageBackgroundColor": "#FFFFFF",  // white
+      "title": "傘の有無を調べますか？",
+      "text": "選択してください。",
+      "defaultAction": {
+        "type": "uri",
+        "label": "View detail",
+        "uri": "http://example.com/page/123"
+      },
+      "actions": [
+        {
+          "type": "postback",
+          "label": "はい",
+          //"data": "action=yes"
+          "data": {
+            action="yes"
+          }
+        },
+        {
+          "type": "postback",
+          "label": "いいえ",
+          "data": "action=no"
+        }
+      ]
+    }
+  };
+  return reply;
+}
+
 //------------------------------------------------------------
+function replyToPostbackEvent(event)
+{
+  var reply = {
+    type: "text",
+    text: "event:postback"
+  };
+  return reply;
+}
+//------------------------------------------------------------
+
+//--------------------------------------------------------------------------------
+//  Listen Port
+//--------------------------------------------------------------------------------
 const port = process.env.PORT || 3000;
 app.listen(port, function()
   {
