@@ -6,8 +6,9 @@
 var request = require("sync-request");
 require('dotenv').load(); 
 
+
 const config = {
-  apiKey: process.env.API_KEY,
+  apiKey: process.env.OPEN_WEATHER_MAP_API_KEY,
   baseUrl: "http://api.openweathermap.org/data/2.5/forecast"
 }
 
