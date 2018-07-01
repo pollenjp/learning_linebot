@@ -108,15 +108,12 @@ function replyToMessageEvent(event)
         {
           "type": "postback",
           "label": "はい",
-          //"data": "action=yes"
-          "data": {
-            action="yes"
-          }
+          "data": "question=needUmbrella&action=yes"
         },
         {
           "type": "postback",
           "label": "いいえ",
-          "data": "action=no"
+          "data": "question=needUmbrella&action=no"
         }
       ]
     }
@@ -127,13 +124,43 @@ function replyToMessageEvent(event)
 //------------------------------------------------------------
 function replyToPostbackEvent(event)
 {
+  var postbackData_obj = queryStringToJSON(event.postback.data);
+  console.log(postbackData_obj);
   var reply = {
     type: "text",
     text: "event:postback"
   };
   return reply;
 }
+
+
 //------------------------------------------------------------
+function queryStringToJSON(qs) {
+  // reference
+  //    Carlo G
+  //      - https://stackoverflow.com/questions/11557526/deserialize-query-string-to-json-object
+  qs = qs || location.search.slice(1);
+
+  var pairs = qs.split('&');
+  var result = {};
+  pairs.forEach(function(p) {
+    var pair = p.split('=');
+    var key = pair[0];
+    var value = decodeURIComponent(pair[1] || '');
+
+    if( result[key] ) {
+      if( Object.prototype.toString.call( result[key] ) === '[object Array]' ) {
+        result[key].push( value );
+      } else {
+        result[key] = [ result[key], value ];
+      }
+    } else {
+      result[key] = value;
+    }
+  });
+
+  return JSON.parse(JSON.stringify(result));
+};
 
 //--------------------------------------------------------------------------------
 //  Listen Port
