@@ -7,6 +7,9 @@ const express = require('express');
 const line = require('@line/bot-sdk');
 require('dotenv').load();               // require and load dotenv
 
+var getWeather = require("./openWeatherAPI/getWeatherInfo_sync.js");
+
+
 //------------------------------------------------------------
 //  KEY
 //------------------------------------------------------------
@@ -38,8 +41,14 @@ function handleEvent(event)
     return Promise.resolve(null);
   }
 
+  //--------------------
   // reply echo
-  const echo = { type: "text", text: event.message.text };
+  var weatherInfo = getWeather.getWeatherInfo();
+  console.log(weatherInfo);
+  const echo = {
+    type: "text",
+    text: weatherInfo
+  };
   return client.replyMessage(event.replyToken, echo);
 }
 
