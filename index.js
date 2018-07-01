@@ -44,57 +44,69 @@ function handleEvent(event)
     return Promise.resolve(null);
   }
 
-  //--------------------
+  //----------------------------------------
   // reply
+  //----------------------------------------
   //--------------------
-  //
-  //----------
-  //  Text Message
-  //----------
-  //var weatherInfo = getWeather.getWeatherInfo();
-  //console.log(weatherInfo);
-  //const reply = {  // Text Message
-  //  type: "text",
-  //  text: weatherInfo[0].city_name
-  //};
-  //----------
-  //  Button Template Message
-  //----------
-  const reply = {  // Button Template Message
-    "type": "template",
-    "altText": "This is a buttons template",
-    "template": {
-      "type": "buttons",
-      "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-      "imageAspectRatio": "rectangle",
-      "imageSize": "cover",
-      "imageBackgroundColor": "#FFFFFF",
-      "title": "Menu",
-      "text": "Please select",
-      "defaultAction": {
-        "type": "uri",
-        "label": "View detail",
-        "uri": "http://example.com/page/123"
-      },
-      "actions": [
-        {
-          "type": "postback",
-          "label": "Buy",
-          "data": "action=buy&itemid=123"
-        },
-        {
-          "type": "postback",
-          "label": "Add to cart",
-          "data": "action=add&itemid=123"
-        },
-        {
+  //  type : message
+  //--------------------
+  if (event.type !== "message" || event.message.type !== "text"){
+    //----------
+    //  Text Message
+    //----------
+    //var weatherInfo = getWeather.getWeatherInfo();
+    //console.log(weatherInfo);
+    //const reply = {  // Text Message
+    //  type: "text",
+    //  text: weatherInfo[0].city_name
+    //};
+    //----------
+    //  Button Template Message
+    //----------
+    const reply = {  // Button Template Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "thumbnailImageUrl": "http://openweathermap.org/img/w/01d.png",
+        "imageAspectRatio": "rectangle",
+        "imageSize": "cover",
+        "imageBackgroundColor": "#FFFFFF",  // white
+        "title": "傘の有無を調べますか？",
+        "text": "選択してください。",
+        "defaultAction": {
           "type": "uri",
           "label": "View detail",
           "uri": "http://example.com/page/123"
-        }
-      ]
-    }
-  };
+        },
+        "actions": [
+          {
+            "type": "postback",
+            "label": "Buy",
+            "data": "action=buy&itemid=123"
+          },
+          {
+            "type": "postback",
+            "label": "Add to cart",
+            "data": "action=add&itemid=123"
+          },
+          {
+            "type": "uri",
+            "label": "View detail",
+            "uri": "http://example.com/page/123"
+          }
+        ]
+      }
+    };
+  }
+  //--------------------
+  //  type : postback
+  //--------------------
+  if (event.type == "postback"){
+    console.log("event:postback");
+    console.log(event);
+  }
+
   return client.replyMessage(event.replyToken, reply);
 }
 
