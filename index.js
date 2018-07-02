@@ -132,16 +132,17 @@ function replyToPostbackEvent(event)
     case "needUmbrella":
       reply = [];
       var weatherInfo = getWeather.getWeatherInfo();
-      // https://raw.githubusercontent.com/pollenjp/learning_linebot/cc27fb93e8150fcc16e2665c3afaa27efb006d5c/image/01d.png
-      //reply = {
-      //  type: "text",
-      //  text: weatherInfo[0].city_name
-      //};
-      var img_base_url = "https://raw.githubusercontent.com/pollenjp/learning_linebot/ba771488af16cf08fcb7fc81a16a89981c8abbdb/image/";
+      var image_base_url = "https://raw.githubusercontent.com/pollenjp/learning_linebot/"
+                           + "ba771488af16cf08fcb7fc81a16a89981c8abbdb"
+                           + "/image/";
+      reply.push({
+        type: "text",
+        text: weatherInfo[0].forecast
+      });
       reply.push({
         "type": "image",
-        "originalContentUrl": img_base_url + weatherInfo[0].icon + ".png",
-        "previewImageUrl"   : img_base_url + weatherInfo[0].icon + ".png"
+        "originalContentUrl": image_base_url + weatherInfo[0].icon + ".png",
+        "previewImageUrl"   : image_base_url + weatherInfo[0].icon + ".png"
       });
       break;
     default:
