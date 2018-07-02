@@ -59,7 +59,7 @@
 - 例
 
 ```
-        case "kantou":
+        case "Kantou":
           reply = {
             "type": "template",
             "altText": "This is a buttons template",
