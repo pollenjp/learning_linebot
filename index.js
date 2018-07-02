@@ -146,11 +146,6 @@ function replyToPostbackEvent(event)
               "imageBackgroundColor": "#FFFFFF",  // white
               "title": "どこの地方ですか？",
               "text": "選択してください。",
-              "defaultAction": {
-                "type" : "postback",
-                "label": "関東",
-                "data" : "question=region" + "&" + "region=Kantou"
-              },
               "actions": [
                 {
                   "type" : "postback",
@@ -171,8 +166,8 @@ function replyToPostbackEvent(event)
 
       //----------------------------------------
     case "region":
-      switch (postback_data_obj.action){
-        case "kantou":
+      switch (postback_data_obj.region){
+        case "Kantou":
           // Button Template Message
           // Question "Which prefecture is there in the region"
           reply = {
@@ -190,12 +185,12 @@ function replyToPostbackEvent(event)
                 {
                   "type" : "postback",
                   "label": "東京",
-                  "data" : "question=prefecture" + "&" + "prefecture=Tokyo"
+                  "data" : "question=prefecture" + "&" + "prefecture=Tokyo" + "&" + "capital=Tokyo"
                 },
                 {
                   "type" : "postback",
                   "label": "千葉",
-                  "data" : "question=prefecture" + "&" + "prefecture=Chiba"
+                  "data" : "question=prefecture" + "&" + "prefecture=Chiba" + "&" + "capital=Chiba"
                 }
               ]
             }
@@ -205,9 +200,10 @@ function replyToPostbackEvent(event)
       break;
 
       //----------------------------------------
-    case "perfecture":
+    case "prefecture":
+      console.log("prefecture");
       reply = [];
-      var weatherInfo = getWeather.getWeatherInfo(postback_data_obj.prefecture);
+      var weatherInfo = getWeather.getWeatherInfo(postback_data_obj.capital);
       var image_base_url = "https://raw.githubusercontent.com/pollenjp/learning_linebot/"
         + "ba771488af16cf08fcb7fc81a16a89981c8abbdb"
         + "/image/";
