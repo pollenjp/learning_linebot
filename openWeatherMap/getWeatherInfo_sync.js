@@ -12,7 +12,7 @@ const config = {
   baseUrl: "http://api.openweathermap.org/data/2.5/forecast"
 }
 
-var city = 'Chiba'
+var city = 'Sapporo'
 
 var data;
 var i = 0;
