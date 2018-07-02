@@ -4,6 +4,15 @@
 
 
 # Link
+- OpenWeatherMap
+  - https://openweathermap.org/weather-conditions
+    - Group 2xx: Thunderstorm
+    - Group 3xx: Drizzle
+    - Group 5xx: Rain
+    - Group 6xx: Snow
+    - Group 7xx: Atmosphere
+    - Group 800: Clear
+    - Group 80x: Clouds
 - Node.js
   - [Node.js で HTTP/HTTPS リクエスト を行う方法 - galife ](https://garafu.blogspot.com/2017/05/node-http-httpss-request.html#getreq)
   - [\[NodeJS\] XMLをJSONに変換する - YoheiM .NET](https://www.yoheim.net/blog.php?q=20130813)
