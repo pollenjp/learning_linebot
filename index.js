@@ -77,7 +77,7 @@ function replyToMessageEvent(event)
   //----------
   //  reply : Text Message
   //----------
-  //var weatherInfo = getWeather.getWeatherInfo();
+  //var weatherInfo = getWeather.getWeatherInfo("Tokyo");
   //console.log(weatherInfo);
   //const reply = {  // Text Message
   //  type: "text",
@@ -129,15 +129,91 @@ function replyToPostbackEvent(event)
   console.log(postback_data_obj);
   var reply;
   switch (postback_data_obj.question){
+      //----------------------------------------
     case "needUmbrella":
+      switch (postback_data_obj.region){
+        case "yes":
+          // Button Template Message
+          // Question "Which region in Japan"
+          reply = {
+            "type": "template",
+            "altText": "This is a buttons template",
+            "template": {
+              "type": "buttons",
+              "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+              "imageAspectRatio": "rectangle",
+              "imageSize": "cover",
+              "imageBackgroundColor": "#FFFFFF",  // white
+              "title": "どこの地方ですか？",
+              "text": "選択してください。",
+              "defaultAction": {
+                "type" : "postback",
+                "label": "関東",
+                "data" : "question=region" + "&" + "region=Kantou"
+              },
+              "actions": [
+                {
+                  "type" : "postback",
+                  "label": "関東",
+                  "data" : "question=region" + "&" + "region=Kantou"
+                }
+              ]
+            }
+          };
+          break;
+      }
+      break;
+
+      //----------------------------------------
+    case "region":
+      switch (postback_data_obj.action){
+        case "kantou":
+          // Button Template Message
+          // Question "Which prefecture is there in the region"
+          reply = {
+            "type": "template",
+            "altText": "This is a buttons template",
+            "template": {
+              "type": "buttons",
+              "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+              "imageAspectRatio": "rectangle",
+              "imageSize": "cover",
+              "imageBackgroundColor": "#FFFFFF",  // white
+              "title": "どこの都道府県ですか？",
+              "text": "選択してください。",
+              "defaultAction": {
+                "type" : "postback",
+                "label": "東京",
+                "data" : "question=prefecture" + "&" + "prefecture=Tokyo"
+              },
+              "actions": [
+                {
+                  "type" : "postback",
+                  "label": "東京",
+                  "data" : "question=prefecture" + "&" + "prefecture=Tokyo"
+                },
+                {
+                  "type" : "postback",
+                  "label": "千葉",
+                  "data" : "question=prefecture" + "&" + "prefecture=Chiba"
+                }
+              ]
+            }
+          };
+          break;
+      }
+      break;
+
+      //----------------------------------------
+    case "perfecture":
       reply = [];
-      var weatherInfo = getWeather.getWeatherInfo();
+      var weatherInfo = getWeather.getWeatherInfo(postback_data_obj.prefecture);
       var image_base_url = "https://raw.githubusercontent.com/pollenjp/learning_linebot/"
-                           + "ba771488af16cf08fcb7fc81a16a89981c8abbdb"
-                           + "/image/";
+        + "ba771488af16cf08fcb7fc81a16a89981c8abbdb"
+        + "/image/";
       reply.push({
         type: "text",
-        text: weatherInfo[0].forecast
+        text: weatherInfo[0].city_name + " : " + weatherInfo[0].forecast
       });
       reply.push({
         "type": "image",
@@ -145,6 +221,7 @@ function replyToPostbackEvent(event)
         "previewImageUrl"   : image_base_url + weatherInfo[0].icon + ".png"
       });
       break;
+
     default:
       reply = {
         type: "text",

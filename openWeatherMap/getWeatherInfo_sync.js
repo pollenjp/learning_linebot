@@ -12,7 +12,7 @@ const config = {
   baseUrl: "http://api.openweathermap.org/data/2.5/forecast"
 }
 
-var city = 'Tokyo'
+var city = 'Chiba'
 
 var data;
 var i = 0;
@@ -20,7 +20,7 @@ var i = 0;
 //----------------------------------------
 //  Main
 //----------------------------------------
-var weatherInfo = getWeatherInfo();
+var weatherInfo = getWeatherInfo(city);
 console.log("After get");
 console.log(weatherInfo);
 
@@ -28,7 +28,7 @@ console.log(weatherInfo);
 //----------------------------------------
 //  getWeatherInfo
 //----------------------------------------
-function getWeatherInfo(){
+function getWeatherInfo(city){
   var body = request(
     'GET',          // Method
     config.baseUrl, // URL
