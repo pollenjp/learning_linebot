@@ -131,7 +131,7 @@ function replyToPostbackEvent(event)
   switch (postback_data_obj.question){
       //----------------------------------------
     case "needUmbrella":
-      switch (postback_data_obj.region){
+      switch (postback_data_obj.action){
         case "yes":
           // Button Template Message
           // Question "Which region in Japan"
@@ -156,6 +156,11 @@ function replyToPostbackEvent(event)
                   "type" : "postback",
                   "label": "関東",
                   "data" : "question=region" + "&" + "region=Kantou"
+                },
+                {
+                  "type" : "postback",
+                  "label": "北海道",
+                  "data" : "question=region" + "&" + "region=Hokkaidou"
                 }
               ]
             }
@@ -181,11 +186,6 @@ function replyToPostbackEvent(event)
               "imageBackgroundColor": "#FFFFFF",  // white
               "title": "どこの都道府県ですか？",
               "text": "選択してください。",
-              "defaultAction": {
-                "type" : "postback",
-                "label": "東京",
-                "data" : "question=prefecture" + "&" + "prefecture=Tokyo"
-              },
               "actions": [
                 {
                   "type" : "postback",
