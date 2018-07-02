@@ -10,7 +10,7 @@
 # 課題
 - 課題を以下のドライブにアップロードしてください。
   - ファイル名は「<地方・ローマ字>.txt（拡張子はなくても構わない）
-  - https://drive.google.com/open?id=1iK9y598plXB38webVbOuxhMFB-p3v_vt
+  - https://drive.google.com/drive/folders/1iK9y598plXB38webVbOuxhMFB-p3v_vt?usp=sharing
 - メモ帳やエディタを使って以下の内容を打ち込む。
 - 以下の項目を各地方に対して埋めてください。
   - 矢印は書かなくていい
