@@ -1,3 +1,4 @@
+# Day
 wget http://openweathermap.org/img/w/01d.png
 wget http://openweathermap.org/img/w/02d.png
 wget http://openweathermap.org/img/w/03d.png
@@ -7,6 +8,16 @@ wget http://openweathermap.org/img/w/10d.png
 wget http://openweathermap.org/img/w/11d.png
 wget http://openweathermap.org/img/w/13d.png
 wget http://openweathermap.org/img/w/50d.png
+# Night
+wget http://openweathermap.org/img/w/01n.png
+wget http://openweathermap.org/img/w/02n.png
+wget http://openweathermap.org/img/w/03n.png
+wget http://openweathermap.org/img/w/04n.png
+wget http://openweathermap.org/img/w/09n.png
+wget http://openweathermap.org/img/w/10n.png
+wget http://openweathermap.org/img/w/11n.png
+wget http://openweathermap.org/img/w/13n.png
+wget http://openweathermap.org/img/w/50n.png
 
 #wget http://openweathermap.org/img/w/01d.png -O "clear sky.png"
 #wget http://openweathermap.org/img/w/02d.png -O "few clouds.png"
