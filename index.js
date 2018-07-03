@@ -205,12 +205,13 @@ function replyToPostbackEvent(event)
       reply = [];
       var weatherInfo = getWeather.getWeatherInfo(postback_data_obj.capital);
       var image_base_url = "https://raw.githubusercontent.com/pollenjp/learning_linebot/"
-        + "ba771488af16cf08fcb7fc81a16a89981c8abbdb"
-        + "/image/";
+        + "d47733b421ddb5b5a6165b168a2807d5e0ad2a21/"
+        + "image/";
       console.log(weatherInfo[0].icon);
       reply.push({
         type: "text",
         text: weatherInfo[0].city_name + " : " + weatherInfo[0].forecast
+          // + ",url:" + image_base_url + weatherInfo[0].icon + ".png"
       });
       reply.push({
         "type": "image",
