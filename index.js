@@ -207,6 +207,7 @@ function replyToPostbackEvent(event)
       var image_base_url = "https://raw.githubusercontent.com/pollenjp/learning_linebot/"
         + "ba771488af16cf08fcb7fc81a16a89981c8abbdb"
         + "/image/";
+      console.log(weatherInfo[0].icon);
       reply.push({
         type: "text",
         text: weatherInfo[0].city_name + " : " + weatherInfo[0].forecast
