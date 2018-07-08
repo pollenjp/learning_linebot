@@ -601,61 +601,74 @@ function replyToPostbackEvent(event)
           //----------------------------------------
           //  九州・沖縄
           //----------------------------------------
-          reply = {
-            "type": "template",
-            "altText": "This is a buttons template",
-            "template": {
-              "type": "buttons",
-              "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-              "imageAspectRatio": "rectangle",
-              "imageSize": "cover",
-              "imageBackgroundColor": "#FFFFFF",
-              "title": "どこの都道府県ですか？",
-              "text": "選択してください。",
-              "actions": [
-                {
-                  "type" : "postback",
-                  "label": "鹿児島",
-                  "data" : "question=prefecture" + "&" + "prefecture=Kagoshima" + "&" + "capital=Kagoshima"
-                },
-                {
-                  "type" : "postback",
-                  "label": "熊本",
-                  "data" : "question=prefecture" + "&" + "prefecture=Kumamoto" + "&" + "capital=Kumamoto"
-                },
-                {
-                  "type" : "postback",
-                  "label": "宮崎",
-                  "data" : "question=prefecture" + "&" + "prefecture=Miyazaki" + "&" + "capital=Miyazaki"
-                },
-                {
-                  "type" : "postback",
-                  "label": "大分",
-                  "data" : "question=prefecture" + "&" + "prefecture=Oita" + "&" + "capital=Oita"
-                },
-                {
-                  "type" : "postback",
-                  "label": "福岡",
-                  "data" : "question=prefecture" + "&" + "prefecture=Fukuoka" + "&" + "capital=Fukuoka"
-                },
-                {
-                  "type" : "postback",
-                  "label": "佐賀",
-                  "data" : "question=prefecture" + "&" + "prefecture=Saga" + "&" + "capital=Saga"
-                },
-                {
-                  "type" : "postback",
-                  "label": "長崎",
-                  "data" : "question=prefecture" + "&" + "prefecture=Ngasaki" + "&" + "capital=Nagasaki"
-                },
-                {
-                  "type" : "postback",
-                  "label": "沖縄",
-                  "data" : "question=prefecture" + "&" + "prefecture=Okinawa" + "&" + "capital=naha"
-                }
-              ]
+          reply = [
+            {
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+                "imageAspectRatio": "rectangle",
+                "imageSize": "cover",
+                "imageBackgroundColor": "#FFFFFF",
+                "title": "どこの都道府県ですか？",
+                "text": "選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "鹿児島",
+                    "data" : "question=prefecture" + "&" + "prefecture=Kagoshima" + "&" + "capital=Kagoshima"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "熊本",
+                    "data" : "question=prefecture" + "&" + "prefecture=Kumamoto" + "&" + "capital=Kumamoto"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "宮崎",
+                    "data" : "question=prefecture" + "&" + "prefecture=Miyazaki" + "&" + "capital=Miyazaki"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "大分",
+                    "data" : "question=prefecture" + "&" + "prefecture=Oita" + "&" + "capital=Oita"
+                  }
+                ]
+              }
+            },
+            {
+              // 2nd Message
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "text": "上の項目か下の項目から選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "福岡",
+                    "data" : "question=prefecture" + "&" + "prefecture=Fukuoka" + "&" + "capital=Fukuoka"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "佐賀",
+                    "data" : "question=prefecture" + "&" + "prefecture=Saga" + "&" + "capital=Saga"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "長崎",
+                    "data" : "question=prefecture" + "&" + "prefecture=Ngasaki" + "&" + "capital=Nagasaki"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "沖縄",
+                    "data" : "question=prefecture" + "&" + "prefecture=Okinawa" + "&" + "capital=naha"
+                  }
+                ]
+              }
             }
-          };
+          ];
           break;
       }
       break;
