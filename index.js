@@ -230,270 +230,332 @@ function replyToPostbackEvent(event)
           //----------------------------------------
           //  北海道・東北
           //----------------------------------------
-          reply = {
-            "type": "template",
-            "altText": "This is a buttons template",
-            "template": {
-              "type": "buttons",
-              "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-              "imageAspectRatio": "rectangle",
-              "imageSize": "cover",
-              "imageBackgroundColor": "#FFFFFF",
-              "title": "どこの都道府県ですか？",
-              "text": "選択してください。",
-              "actions": [
-                {
-                  "type" : "postback",
-                  "label": "北海道",
-                  "data" : "question=prefecture" + "&" + "prefecture=Hokkaidou" + "&" + "capital=Sapporo"
-                },
-                {
-                  "type" : "postback",
-                  "label": "青森",
-                  "data" : "question=prefecture" + "&" + "prefecture=Aomori" + "&" + "capital=Aomori"
-                },
-                {
-                  "type" : "postback",
-                  "label": "岩手",
-                  "data" : "question=prefecture" + "&" + "prefecture=Iwate" + "&" + "capital=Morioka"
-                },
-                {
-                  "type" : "postback",
-                  "label": "宮城",
-                  "data" : "question=prefecture" + "&" + "prefecture=Miyagi" + "&" + "capital=Sendai"
-                },
-                {
-                  "type" : "postback",
-                  "label": "秋田",
-                  "data" : "question=prefecture" + "&" + "prefecture=Akita" + "&" + "capital=Akita"
-                },
-                {
-                  "type" : "postback",
-                  "label": "山形",
-                  "data" : "question=prefecture" + "&" + "prefecture=Yamagata" + "&" + "capital=Yamagata"
-                },
-                {
-                  "type" : "postback",
-                  "label": "福島",
-                  "data" : "question=prefecture" + "&" + "prefecture=Fukushima" + "&" + "capital=Fukushima"
-                }
-              ]
+          reply = [
+            {
+              // 1st Message
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+                "imageAspectRatio": "rectangle",
+                "imageSize": "cover",
+                "imageBackgroundColor": "#FFFFFF",
+                "title": "どこの都道府県ですか？",
+                "text": "選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "北海道",
+                    "data" : "question=prefecture" + "&" + "prefecture=Hokkaidou" + "&" + "capital=Sapporo"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "青森",
+                    "data" : "question=prefecture" + "&" + "prefecture=Aomori" + "&" + "capital=Aomori"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "岩手",
+                    "data" : "question=prefecture" + "&" + "prefecture=Iwate" + "&" + "capital=Morioka"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "宮城",
+                    "data" : "question=prefecture" + "&" + "prefecture=Miyagi" + "&" + "capital=Sendai"
+                  }
+                ]
+              }
+            },
+            {
+              // 2nd Message
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "text": "上の項目か下の項目から選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "秋田",
+                    "data" : "question=prefecture" + "&" + "prefecture=Akita" + "&" + "capital=Akita"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "山形",
+                    "data" : "question=prefecture" + "&" + "prefecture=Yamagata" + "&" + "capital=Yamagata"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "福島",
+                    "data" : "question=prefecture" + "&" + "prefecture=Fukushima" + "&" + "capital=Fukushima"
+                  }
+                ]
+              }
             }
-          };
+          ];
           break;
-
         case "Kantou":
           //----------------------------------------
           //  関東
           //----------------------------------------
-          reply = {
-            "type": "template",
-            "altText": "This is a buttons template",
-            "template": {
-              "type": "buttons",
-              "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-              "imageAspectRatio": "rectangle",
-              "imageSize": "cover",
-              "imageBackgroundColor": "#FFFFFF",
-              "title": "どこの都道府県ですか？",
-              "text": "選択してください。",
-              "actions": [
-                {
-                  "type" : "postback",
-                  "label": "東京",
-                  "data" : "question=prefecture" + "&" + "prefecture=Tokyo" + "&" + "capital=Tokyo"
-                },
-                {
-                  "type" : "postback",
-                  "label": "神奈川",
-                  "data" : "question=prefecture" + "&" + "prefecture=kanagawa" + "&" + "capital=Yokohama"
-                },
-                {
-                  "type" : "postback",
-                  "label": "埼玉",
-                  "data" : "question=prefecture" + "&" + "prefecture=Saitama" + "&" + "capital=Saitama"
-                }, 
-                {
-                  "type" : "postback",
-                  "label": "千葉",
-                  "data" : "question=prefecture" + "&" + "prefecture=Chiba" + "&" + "capital=Chiba"
-                }, 
-                {
-                  "type" : "postback",
-                  "label": "茨城",
-                  "data" : "question=prefecture" + "&" + "prefecture=Ibaraki" + "&" + "capital=Mito"
-                }, 
-                {
-                  "type" : "postback",
-                  "label": "群馬",
-                  "data" : "question=prefecture" + "&" + "prefecture=Gunma" + "&" + "capital=Maebashi"
-                }, 
-                {
-                  "type" : "postback",
-                  "label": "栃木",
-                  "data" : "question=prefecture" + "&" + "prefecture=Tochigi" + "&" + "capital=Utsunomiya"
-                }
-              ]
+          reply = [
+            {
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+                "imageAspectRatio": "rectangle",
+                "imageSize": "cover",
+                "imageBackgroundColor": "#FFFFFF",
+                "title": "どこの都道府県ですか？",
+                "text": "選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "東京",
+                    "data" : "question=prefecture" + "&" + "prefecture=Tokyo" + "&" + "capital=Tokyo"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "神奈川",
+                    "data" : "question=prefecture" + "&" + "prefecture=kanagawa" + "&" + "capital=Yokohama"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "埼玉",
+                    "data" : "question=prefecture" + "&" + "prefecture=Saitama" + "&" + "capital=Saitama"
+                  }, 
+                  {
+                    "type" : "postback",
+                    "label": "千葉",
+                    "data" : "question=prefecture" + "&" + "prefecture=Chiba" + "&" + "capital=Chiba"
+                  }
+                ]
+              }
+            },
+            {
+              // 2nd Message
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "text": "上の項目か下の項目から選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "茨城",
+                    "data" : "question=prefecture" + "&" + "prefecture=Ibaraki" + "&" + "capital=Mito"
+                  }, 
+                  {
+                    "type" : "postback",
+                    "label": "群馬",
+                    "data" : "question=prefecture" + "&" + "prefecture=Gunma" + "&" + "capital=Maebashi"
+                  }, 
+                  {
+                    "type" : "postback",
+                    "label": "栃木",
+                    "data" : "question=prefecture" + "&" + "prefecture=Tochigi" + "&" + "capital=Utsunomiya"
+                  }
+                ]
+              }
             }
-          };
+          ];
           break;
-
         case "Chubu":
           //----------------------------------------
           //  中部
           //----------------------------------------
-          reply = {
-            "type": "template",
-            "altText": "This is a buttons template",
-            "template": {
-              "type": "buttons",
-              "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-              "imageAspectRatio": "rectangle",
-              "imageSize": "cover",
-              "imageBackgroundColor": "#FFFFFF",
-              "title": "どこの都道府県ですか？",
-              "text": "選択してください。",
-              "actions": [
-                {
-                  "type" : "postback",
-                  "label": "静岡",
-                  "data" : "question=prefecture" + "&" + "prefecture=Shizuoka" + "&" + "capital=Shizuoka"
-                },
-                {
-                  "type" : "postback",
-                  "label": "愛知",
-                  "data" : "question=prefecture" + "&" + "prefecture=Aichi" + "&" + "capital=Nagoya"
-                },
-                {
-                  "type" : "postback",
-                  "label": "岐阜",
-                  "data" : "question=prefecture" + "&" + "prefecture=Gifu" + "&" + "capital=Gifu-shi"
-                }, 
-                {
-                  "type" : "postback",
-                  "label": "新潟",
-                  "data" : "question=prefecture" + "&" + "prefecture=Niigata" + "&" + "capital=Niigata"
-                },
-                {
-                  "type" : "postback",
-                  "label": "富山",
-                  "data" : "question=prefecture" + "&" + "prefecture=Toyama" + "&" + "capital=Toyama"
-                },
-                {
-                  "type" : "postback",
-                  "label": "石川",
-                  "data" : "question=prefecture" + "&" + "prefecture=Ishikawa" + "&" + "capital=Kanazawa"
-                },
-                {
-                  "type" : "postback",
-                  "label": "福井",
-                  "data" : "question=prefecture" + "&" + "prefecture=Fukui" + "&" + "capital=Fukui"
-                }
-              ]
+          reply = [
+            {
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+                "imageAspectRatio": "rectangle",
+                "imageSize": "cover",
+                "imageBackgroundColor": "#FFFFFF",
+                "title": "どこの都道府県ですか？",
+                "text": "選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "静岡",
+                    "data" : "question=prefecture" + "&" + "prefecture=Shizuoka" + "&" + "capital=Shizuoka"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "愛知",
+                    "data" : "question=prefecture" + "&" + "prefecture=Aichi" + "&" + "capital=Nagoya"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "岐阜",
+                    "data" : "question=prefecture" + "&" + "prefecture=Gifu" + "&" + "capital=Gifu-shi"
+                  }, 
+                  {
+                    "type" : "postback",
+                    "label": "新潟",
+                    "data" : "question=prefecture" + "&" + "prefecture=Niigata" + "&" + "capital=Niigata"
+                  },
+                ]
+              }
+            },
+            {
+              // 2nd Message
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "text": "上の項目か下の項目から選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "富山",
+                    "data" : "question=prefecture" + "&" + "prefecture=Toyama" + "&" + "capital=Toyama"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "石川",
+                    "data" : "question=prefecture" + "&" + "prefecture=Ishikawa" + "&" + "capital=Kanazawa"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "福井",
+                    "data" : "question=prefecture" + "&" + "prefecture=Fukui" + "&" + "capital=Fukui"
+                  }
+                ]
+              }
             }
-          };
+          ];
           break;
-
         case "Kinki": 
           //----------------------------------------
           //  近畿
           //----------------------------------------
-          reply = { 
-            "type": "template", 
-            "altText": "This is a buttons template", 
-            "template": {
-              "type": "buttons", 
-              "thumbnailImageUrl": "https://example.com/bot/images/image.jpg", 
-              "imageAspectRatio": "rectangle", 
-              "imageSize": "cover", 
-              "imageBackgroundColor": "#FFFFFF", 
-              "title": "どこの都道府県ですか？", 
-              "text": "選択してください。", 
-              "actions": [ 
-                { 
-                  "type" : "postback", 
-                  "label": "兵庫", 
-                  "data" : "question=prefecture" + "&" + "prefecture=Hyogo" + "&" + "capital=Cobe" 
-                }, 
-                { 
-                  "type" : "postback", 
-                  "label": "京都", 
-                  "data" : "question=prefecture" + "&" + "prefecture=Kyoto" + "&" + "capital=Kyoto" 
-                }, 
-                { 
-                  "type" : "postback", 
-                  "label": "大阪", 
-                  "data" : "question=prefecture" + "&" + "prefecture=Osaka" + "&" + "capital=Osaka" 
-                },
-                { 
-                  "type" : "postback", 
-                  "label": "和歌山", 
-                  "data" : "question=prefecture" + "&" + "prefecture=Wakayama" + "&" + "capital=Wakayama" 
-                },
-                { 
-                  "type" : "postback", 
-                  "label": "滋賀", 
-                  "data" : "question=prefecture" + "&" + "prefecture=Shiga" + "&" + "capital=Otsu" 
-                },
-                { 
-                  "type" : "postback", 
-                  "label": "奈良", 
-                  "data" : "question=prefecture" + "&" + "prefecture=Nara" + "&" + "capital=Nara" 
-                },
-                { 
-                  "type" : "postback", 
-                  "label": "三重", 
-                  "data" : "question=prefecture" + "&" + "prefecture=Mie" + "&" + "capital=Tsu" 
-                }
-              ] 
-            } 
-          }; 
+          reply = [
+            { 
+              "type": "template", 
+              "altText": "This is a buttons template", 
+              "template": {
+                "type": "buttons", 
+                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg", 
+                "imageAspectRatio": "rectangle", 
+                "imageSize": "cover", 
+                "imageBackgroundColor": "#FFFFFF", 
+                "title": "どこの都道府県ですか？", 
+                "text": "選択してください。", 
+                "actions": [ 
+                  { 
+                    "type" : "postback", 
+                    "label": "兵庫", 
+                    "data" : "question=prefecture" + "&" + "prefecture=Hyogo" + "&" + "capital=Cobe" 
+                  }, 
+                  { 
+                    "type" : "postback", 
+                    "label": "京都", 
+                    "data" : "question=prefecture" + "&" + "prefecture=Kyoto" + "&" + "capital=Kyoto" 
+                  }, 
+                  { 
+                    "type" : "postback", 
+                    "label": "大阪", 
+                    "data" : "question=prefecture" + "&" + "prefecture=Osaka" + "&" + "capital=Osaka" 
+                  },
+                  { 
+                    "type" : "postback", 
+                    "label": "和歌山", 
+                    "data" : "question=prefecture" + "&" + "prefecture=Wakayama" + "&" + "capital=Wakayama" 
+                  }
+                ] 
+              } 
+            },
+            {
+              // 2nd Message
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "text": "上の項目か下の項目から選択してください。",
+                "actions": [
+                  { 
+                    "type" : "postback", 
+                    "label": "滋賀", 
+                    "data" : "question=prefecture" + "&" + "prefecture=Shiga" + "&" + "capital=Otsu" 
+                  },
+                  { 
+                    "type" : "postback", 
+                    "label": "奈良", 
+                    "data" : "question=prefecture" + "&" + "prefecture=Nara" + "&" + "capital=Nara" 
+                  },
+                  { 
+                    "type" : "postback", 
+                    "label": "三重", 
+                    "data" : "question=prefecture" + "&" + "prefecture=Mie" + "&" + "capital=Tsu" 
+                  }
+                ]
+              }
+            }
+          ];
           break;
-
         case "Chugoku":
           //----------------------------------------
           //  中国
           //----------------------------------------
-          reply = {
-            "type": "template",
-            "altText": "This is a buttons template",
-            "template": {
-              "type": "buttons",
-              "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-              "imageAspectRatio": "rectangle",
-              "imageSize": "cover",
-              "imageBackgroundColor": "#FFFFFF",
-              "title": "どこの都道府県ですか？",
-              "text": "選択してください。",
-              "actions": [
-                {
-                  "type" : "postback",
-                  "label": "山口",
-                  "data" : "question=prefecture" + "&" + "prefecture=Yamaguchi" + "&" + "capital=Yamaguchi"
-                },
-                {
-                  "type" : "postback",
-                  "label": "広島",
-                  "data" : "question=prefecture" + "&" + "prefecture=Hiroshima" + "&" + "capital=Hiroshima"
-                },
-                {
-                  "type" : "postback",
-                  "label": "岡山",
-                  "data" : "question=prefecture" + "&" + "prefecture=Okayama" + "&" + "capital=Okayama"
-                },
-                {
-                  "type" : "postback",
-                  "label": "島根",
-                  "data" : "question=prefecture" + "&" + "prefecture=Shimane" + "&" + "capital=Matsue"
-                },
-                {
-                  "type" : "postback",
-                  "label": "鳥取",
-                  "data" : "question=prefecture" + "&" + "prefecture=Tottori" + "&" + "capital=Tottori"
-                }
-              ]
+          reply = [
+            {
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+                "imageAspectRatio": "rectangle",
+                "imageSize": "cover",
+                "imageBackgroundColor": "#FFFFFF",
+                "title": "どこの都道府県ですか？",
+                "text": "選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "山口",
+                    "data" : "question=prefecture" + "&" + "prefecture=Yamaguchi" + "&" + "capital=Yamaguchi"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "広島",
+                    "data" : "question=prefecture" + "&" + "prefecture=Hiroshima" + "&" + "capital=Hiroshima"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "岡山",
+                    "data" : "question=prefecture" + "&" + "prefecture=Okayama" + "&" + "capital=Okayama"
+                  }
+                ]
+              }
+            },
+            {
+              // 2nd Message
+              "type": "template",
+              "altText": "This is a buttons template",
+              "template": {
+                "type": "buttons",
+                "text": "上の項目か下の項目から選択してください。",
+                "actions": [
+                  {
+                    "type" : "postback",
+                    "label": "島根",
+                    "data" : "question=prefecture" + "&" + "prefecture=Shimane" + "&" + "capital=Matsue"
+                  },
+                  {
+                    "type" : "postback",
+                    "label": "鳥取",
+                    "data" : "question=prefecture" + "&" + "prefecture=Tottori" + "&" + "capital=Tottori"
+                  }
+                ]
+              }
             }
-          };
+          ];
           break;
         case "Shikoku":
           //----------------------------------------
