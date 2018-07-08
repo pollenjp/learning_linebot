@@ -663,7 +663,7 @@ function replyToPostbackEvent(event)
                   {
                     "type" : "postback",
                     "label": "沖縄",
-                    "data" : "question=prefecture" + "&" + "prefecture=Okinawa" + "&" + "capital=naha"
+                    "data" : "question=prefecture" + "&" + "prefecture=Okinawa" + "&" + "capital=Naha-shi"
                   }
                 ]
               }
