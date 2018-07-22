@@ -94,13 +94,11 @@ async function handleEvent(event, req, res)
   //  type : postback
   //--------------------
   switch ( event.type ){
-    case "follow": replyToFollowEvent(event, req, res); break;
-    case "message": replyToMessageEvent(event, req, res); break;
-    case "postback": replyToPostbackEvent(event, req, res); break;
+    case "follow"   : replyToFollowEvent(event, req, res); break;
+    case "message"  : replyToMessageEvent(event, req, res); break;
+    case "postback" : replyToPostbackEvent(event, req, res); break;
     default:
   }
-    result = client.replyMessage(event.replyToken, reply);
-    res.json(result);
 }
 
 
@@ -114,12 +112,15 @@ async function replyToFollowEvent(event, req, res)
   //----------------------------------------
   var sqlText = 'INSERT INTO userinfo(userId) VALUES($1);'
   var sqlValues = [event.source.userId]
-  db.any(sqlText, sqlValues);
+  db.any(sqlText, sqlValues)
+    .catch( (err) => {
+      console.log("Error (replyToFollowEvent : register on database) : \n", err);
+    });
 
   //----------------------------------------
   //  reply message
   //----------------------------------------
-  let reply = askWhetherToSettingDefaultPlace();
+  let reply = askQuestion();
   let result = client.replyMessage(event.replyToken, reply);
   res.json(result);
 }
@@ -128,61 +129,18 @@ async function replyToFollowEvent(event, req, res)
 //--------------------------------------------------------------------------------
 //  replyToMessageEvent
 //--------------------------------------------------------------------------------
-function replyToMessageEvent(event)
+async function replyToMessageEvent(event)
 {
-  //----------
-  //  reply : Text Message
-  //----------
-  //var weatherInfo = getWeather.getWeatherInfo("Tokyo");
-  //console.log(weatherInfo);
-  //const reply = {  // Text Message
-  //  type: "text",
-  //  text: weatherInfo[0].city_name
-  //};
-  //----------
-  //  reply : Button Template Message
-  //----------
-  var reply = {  // Button Template Message
-    "type": "template",
-    "altText": "This is a buttons template",
-    "template": {
-      "type": "buttons",
-      //"thumbnailImageUrl": "http://openweathermap.org/img/w/01d.png",
-      "thumbnailImageUrl":
-        "https://raw.githubusercontent.com/pollenjp/learning_linebot/feature/line-sdk/image/umbrella01.gif",
-      //"thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-      "imageAspectRatio": "rectangle",
-      "imageSize": "cover",
-      "imageBackgroundColor": "#FFFFFF",  // white
-      "title": "傘の有無を調べますか？",
-      "text": "選択してください。",
-      "defaultAction": {
-        "type": "uri",
-        "label": "View detail",
-        "uri": "http://example.com/page/123"
-      },
-      "actions": [
-        {
-          "type": "postback",
-          "label": "はい",
-          "data": "question=needUmbrella&action=yes"
-        }
-        //{
-        //  "type": "postback",
-        //  "label": "いいえ",
-        //  "data": "question=needUmbrella&action=no"
-        //}
-      ]
-    }
-  };
-  return reply;
+  let reply = askQuestion(event.replyToken, reply);
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
 }
 
 
 //--------------------------------------------------------------------------------
 //  replyToPostbackEvent
 //--------------------------------------------------------------------------------
-function replyToPostbackEvent(event)
+async function replyToPostbackEvent(event, req, res)
 {
   var postback_data_obj = queryStringToJSON(event.postback.data);
   console.log(postback_data_obj);
@@ -190,25 +148,32 @@ function replyToPostbackEvent(event)
   //--------------------------------------------------------------------------------
   //  Switch
   //    - needUmbrella
+  //    - setPlace
   //    - region
   //    - prefecture
   //--------------------------------------------------------------------------------
   switch (postback_data_obj.question){
+
+    case "needUmbrella":
       //------------------------------------------------------------
       //  needUmbrella
       //------------------------------------------------------------
-    case "needUmbrella":
       switch (postback_data_obj.action){
         case "yes":
           // データベースを確認してデフォルト地域がなければ
           // 地域を聞く.
-          sqlText = 'select * ';
-          pool.query( sqlText, sqlValues, (err, res) => {
-            if (err){
-              throw err;
-            }
-            console.log("DATABASE INSERT userId");
-          });
+          let sqlText = `SELECT savePlace FROM userinfo WHERE userid = $1`;
+          let sqlValues = [ event.source.userId ];
+          // savePlace (0: no, 1: want to save, 2: saved)
+          let savePlace = await db.any( sqlText, sqlValues)
+            .catch( (err) => {
+              console.log("Error : ", err);
+            });
+          if ( savePlace[0].savePlace != 2){
+            askSavePlace(event, req, res);
+          } else {
+
+          }
           // if in database
           //  reply the answer
           // else
@@ -217,79 +182,19 @@ function replyToPostbackEvent(event)
       }
       break;
 
+    case "setPlace":
       //------------------------------------------------------------
       //  setPlace
       //------------------------------------------------------------
-    case "setPlace":
       switch (postback_data_obj.action){
         case "yes":
-          // Button Template Message
-          // Question "Which region in Japan"
-          reply = [
-            {
-              // 1st Message
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-                "imageAspectRatio": "rectangle",
-                "imageSize": "cover",
-                "imageBackgroundColor": "#FFFFFF",
-                "title": "どこの地方ですか？",
-                "text": "選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "北海道・東北",
-                    "data" : "question=region" + "&" + "region=HokkaidouTouhoku"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "関東",
-                    "data" : "question=region" + "&" + "region=Kantou"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "中部",
-                    "data" : "question=region" + "&" + "region=Chubu"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "近畿",
-                    "data" : "question=region" + "&" + "region=Kinki"
-                  }
-                ]
-              }
-            },
-            {
-              // 2nd Message
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "text": "上の項目か下の項目から選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "中国",
-                    "data" : "question=region" + "&" + "region=Chugoku"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "四国",
-                    "data" : "question=region" + "&" + "region=Shikoku"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "九州・沖縄",
-                    "data" : "question=region" + "&" + "region=KyushuOkinawa"
-                  }
-                ]
-              }
-            },
-          ];
-          break;
+          let sqlText = `UPDATE userinfo SET savePlace = $1 WHERE userid = $2`;
+          let sqlValues = [ 1, event.source.userId ];
+          await db.any( sqlText, sqlValues )
+            .catch( (err) => { console.log( "Error : ", err); } );
+          askRegions(event, req, res);
+          return;
+        case "no":
       }
       break;
 
@@ -304,450 +209,22 @@ function replyToPostbackEvent(event)
       switch (postback_data_obj.region){
           // Button Template Message
           // Question "Which prefecture is there in the region"
-        case "HokkaidouTouhoku":
           //----------------------------------------
           //  北海道・東北
-          //----------------------------------------
-          reply = [
-            {
-              // 1st Message
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-                "imageAspectRatio": "rectangle",
-                "imageSize": "cover",
-                "imageBackgroundColor": "#FFFFFF",
-                "title": "どこの都道府県ですか？",
-                "text": "選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "北海道",
-                    "data" : "question=prefecture" + "&" + "prefecture=Hokkaidou" + "&" + "capital=Sapporo"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "青森",
-                    "data" : "question=prefecture" + "&" + "prefecture=Aomori" + "&" + "capital=Aomori"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "岩手",
-                    "data" : "question=prefecture" + "&" + "prefecture=Iwate" + "&" + "capital=Morioka"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "宮城",
-                    "data" : "question=prefecture" + "&" + "prefecture=Miyagi" + "&" + "capital=Sendai"
-                  }
-                ]
-              }
-            },
-            {
-              // 2nd Message
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "text": "上の項目か下の項目から選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "秋田",
-                    "data" : "question=prefecture" + "&" + "prefecture=Akita" + "&" + "capital=Akita"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "山形",
-                    "data" : "question=prefecture" + "&" + "prefecture=Yamagata" + "&" + "capital=Yamagata"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "福島",
-                    "data" : "question=prefecture" + "&" + "prefecture=Fukushima" + "&" + "capital=Fukushima"
-                  }
-                ]
-              }
-            }
-          ];
-          break;
-        case "Kantou":
-          //----------------------------------------
           //  関東
-          //----------------------------------------
-          reply = [
-            {
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-                "imageAspectRatio": "rectangle",
-                "imageSize": "cover",
-                "imageBackgroundColor": "#FFFFFF",
-                "title": "どこの都道府県ですか？",
-                "text": "選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "東京",
-                    "data" : "question=prefecture" + "&" + "prefecture=Tokyo" + "&" + "capital=Tokyo"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "神奈川",
-                    "data" : "question=prefecture" + "&" + "prefecture=kanagawa" + "&" + "capital=Yokohama"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "埼玉",
-                    "data" : "question=prefecture" + "&" + "prefecture=Saitama" + "&" + "capital=Saitama"
-                  }, 
-                  {
-                    "type" : "postback",
-                    "label": "千葉",
-                    "data" : "question=prefecture" + "&" + "prefecture=Chiba" + "&" + "capital=Chiba"
-                  }
-                ]
-              }
-            },
-            {
-              // 2nd Message
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "text": "上の項目か下の項目から選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "茨城",
-                    "data" : "question=prefecture" + "&" + "prefecture=Ibaraki" + "&" + "capital=Mito"
-                  }, 
-                  {
-                    "type" : "postback",
-                    "label": "群馬",
-                    "data" : "question=prefecture" + "&" + "prefecture=Gunma" + "&" + "capital=Maebashi"
-                  }, 
-                  {
-                    "type" : "postback",
-                    "label": "栃木",
-                    "data" : "question=prefecture" + "&" + "prefecture=Tochigi" + "&" + "capital=Utsunomiya"
-                  }
-                ]
-              }
-            }
-          ];
-          break;
-        case "Chubu":
-          //----------------------------------------
           //  中部
-          //----------------------------------------
-          reply = [
-            {
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-                "imageAspectRatio": "rectangle",
-                "imageSize": "cover",
-                "imageBackgroundColor": "#FFFFFF",
-                "title": "どこの都道府県ですか？",
-                "text": "選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "静岡",
-                    "data" : "question=prefecture" + "&" + "prefecture=Shizuoka" + "&" + "capital=Shizuoka"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "愛知",
-                    "data" : "question=prefecture" + "&" + "prefecture=Aichi" + "&" + "capital=Nagoya"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "岐阜",
-                    "data" : "question=prefecture" + "&" + "prefecture=Gifu" + "&" + "capital=Gifu-shi"
-                  }, 
-                  {
-                    "type" : "postback",
-                    "label": "新潟",
-                    "data" : "question=prefecture" + "&" + "prefecture=Niigata" + "&" + "capital=Niigata"
-                  },
-                ]
-              }
-            },
-            {
-              // 2nd Message
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "text": "上の項目か下の項目から選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "富山",
-                    "data" : "question=prefecture" + "&" + "prefecture=Toyama" + "&" + "capital=Toyama"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "石川",
-                    "data" : "question=prefecture" + "&" + "prefecture=Ishikawa" + "&" + "capital=Kanazawa"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "福井",
-                    "data" : "question=prefecture" + "&" + "prefecture=Fukui" + "&" + "capital=Fukui"
-                  }
-                ]
-              }
-            }
-          ];
-          break;
-        case "Kinki": 
-          //----------------------------------------
           //  近畿
-          //----------------------------------------
-          reply = [
-            { 
-              "type": "template", 
-              "altText": "This is a buttons template", 
-              "template": {
-                "type": "buttons", 
-                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg", 
-                "imageAspectRatio": "rectangle", 
-                "imageSize": "cover", 
-                "imageBackgroundColor": "#FFFFFF", 
-                "title": "どこの都道府県ですか？", 
-                "text": "選択してください。", 
-                "actions": [ 
-                  { 
-                    "type" : "postback", 
-                    "label": "兵庫", 
-                    "data" : "question=prefecture" + "&" + "prefecture=Hyogo" + "&" + "capital=Cobe" 
-                  }, 
-                  { 
-                    "type" : "postback", 
-                    "label": "京都", 
-                    "data" : "question=prefecture" + "&" + "prefecture=Kyoto" + "&" + "capital=Kyoto" 
-                  }, 
-                  { 
-                    "type" : "postback", 
-                    "label": "大阪", 
-                    "data" : "question=prefecture" + "&" + "prefecture=Osaka" + "&" + "capital=Osaka" 
-                  },
-                  { 
-                    "type" : "postback", 
-                    "label": "和歌山", 
-                    "data" : "question=prefecture" + "&" + "prefecture=Wakayama" + "&" + "capital=Wakayama" 
-                  }
-                ] 
-              } 
-            },
-            {
-              // 2nd Message
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "text": "上の項目か下の項目から選択してください。",
-                "actions": [
-                  { 
-                    "type" : "postback", 
-                    "label": "滋賀", 
-                    "data" : "question=prefecture" + "&" + "prefecture=Shiga" + "&" + "capital=Otsu" 
-                  },
-                  { 
-                    "type" : "postback", 
-                    "label": "奈良", 
-                    "data" : "question=prefecture" + "&" + "prefecture=Nara" + "&" + "capital=Nara" 
-                  },
-                  { 
-                    "type" : "postback", 
-                    "label": "三重", 
-                    "data" : "question=prefecture" + "&" + "prefecture=Mie" + "&" + "capital=Tsu" 
-                  }
-                ]
-              }
-            }
-          ];
-          break;
-        case "Chugoku":
-          //----------------------------------------
           //  中国
-          //----------------------------------------
-          reply = [
-            {
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-                "imageAspectRatio": "rectangle",
-                "imageSize": "cover",
-                "imageBackgroundColor": "#FFFFFF",
-                "title": "どこの都道府県ですか？",
-                "text": "選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "山口",
-                    "data" : "question=prefecture" + "&" + "prefecture=Yamaguchi" + "&" + "capital=Yamaguchi"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "広島",
-                    "data" : "question=prefecture" + "&" + "prefecture=Hiroshima" + "&" + "capital=Hiroshima"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "岡山",
-                    "data" : "question=prefecture" + "&" + "prefecture=Okayama" + "&" + "capital=Okayama"
-                  }
-                ]
-              }
-            },
-            {
-              // 2nd Message
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "text": "上の項目か下の項目から選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "島根",
-                    "data" : "question=prefecture" + "&" + "prefecture=Shimane" + "&" + "capital=Matsue"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "鳥取",
-                    "data" : "question=prefecture" + "&" + "prefecture=Tottori" + "&" + "capital=Tottori"
-                  }
-                ]
-              }
-            }
-          ];
-          break;
-        case "Shikoku":
-          //----------------------------------------
           //  四国
-          //----------------------------------------
-          reply = {
-            "type": "template",
-            "altText": "This is a buttons template",
-            "template": {
-              "type": "buttons",
-              "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-              "imageAspectRatio": "rectangle",
-              "imageSize": "cover",
-              "imageBackgroundColor": "#FFFFFF",
-              "title": "どこの都道府県ですか？",
-              "text": "選択してください。",
-              "actions": [
-                {
-                  "type" : "postback",
-                  "label": "香川",
-                  "data" : "question=prefecture" + "&" + "prefecture=kagawa" + "&" + "capital=Takamatsu"
-                },
-                {
-                  "type" : "postback",
-                  "label": "徳島",
-                  "data" : "question=prefecture" + "&" + "prefecture=Tokushima" + "&" + "capital=Tokushima"
-                },
-                {
-                  "type" : "postback",
-                  "label": "愛媛",
-                  "data" : "question=prefecture" + "&" + "prefecture=Ehime" + "&" + "capital=Matsuyama"
-                },
-                {
-                  "type" : "postback",
-                  "label": "高知",
-                  "data" : "question=prefecture" + "&" + "prefecture=Kochi" + "&" + "capital=Kochi"
-                }
-              ]
-            }
-          };
-          break;
-        case "KyushuOkinawa":
-          //----------------------------------------
           //  九州・沖縄
           //----------------------------------------
-          reply = [
-            {
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-                "imageAspectRatio": "rectangle",
-                "imageSize": "cover",
-                "imageBackgroundColor": "#FFFFFF",
-                "title": "どこの都道府県ですか？",
-                "text": "選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "鹿児島",
-                    "data" : "question=prefecture" + "&" + "prefecture=Kagoshima" + "&" + "capital=Kagoshima"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "熊本",
-                    "data" : "question=prefecture" + "&" + "prefecture=Kumamoto" + "&" + "capital=Kumamoto"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "宮崎",
-                    "data" : "question=prefecture" + "&" + "prefecture=Miyazaki" + "&" + "capital=Miyazaki"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "大分",
-                    "data" : "question=prefecture" + "&" + "prefecture=Oita" + "&" + "capital=Oita"
-                  }
-                ]
-              }
-            },
-            {
-              // 2nd Message
-              "type": "template",
-              "altText": "This is a buttons template",
-              "template": {
-                "type": "buttons",
-                "text": "上の項目か下の項目から選択してください。",
-                "actions": [
-                  {
-                    "type" : "postback",
-                    "label": "福岡",
-                    "data" : "question=prefecture" + "&" + "prefecture=Fukuoka" + "&" + "capital=Fukuoka"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "佐賀",
-                    "data" : "question=prefecture" + "&" + "prefecture=Saga" + "&" + "capital=Saga"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "長崎",
-                    "data" : "question=prefecture" + "&" + "prefecture=Ngasaki" + "&" + "capital=Nagasaki"
-                  },
-                  {
-                    "type" : "postback",
-                    "label": "沖縄",
-                    "data" : "question=prefecture" + "&" + "prefecture=Okinawa" + "&" + "capital=Naha-shi"
-                  }
-                ]
-              }
-            }
-          ];
-          break;
+        case "HokkaidouTouhoku" : selectHokkaidouTouhoku(event, req, res); return;
+        case "Kantou"           : selectKantou(event, req, res); return;
+        case "Chubu"            : selectChubu(event, req, res); return;
+        case "Kinki"            : selectKinki(event, req, res); return;
+        case "Chugoku"          : selectChugoku(event, req, res); return;
+        case "Shikoku"          : selectShikoku(event, req, res); return;
+        case "KyushuOkinawa"    : selectKyushuOkinawa(event, req, res); return;
       }
       break;
 
@@ -756,65 +233,716 @@ function replyToPostbackEvent(event)
       //  Prefecture
       //------------------------------------------------------------
       console.log("prefecture");
-      reply = [];
-      var weatherInfo = getWeather.getWeatherInfo(postback_data_obj.capital);
-      var image_base_url = "https://raw.githubusercontent.com/pollenjp/learning_linebot/"
-        + "d47733b421ddb5b5a6165b168a2807d5e0ad2a21/"
-        + "image/";
-      console.log(weatherInfo[0].icon);
-      reply.push({
-        type: "text",
-        text: weatherInfo[0].city_name + " : " + weatherInfo[0].forecast
-        // + ",url:" + image_base_url + weatherInfo[0].icon + ".png"
-      });
-      reply.push({
-        "type": "image",
-        "originalContentUrl": image_base_url + weatherInfo[0].icon + ".png",
-        "previewImageUrl"   : image_base_url + weatherInfo[0].icon + ".png"
-      });
-      break;
+      answerUmbrellaNecessity(event, req, res);
+      return;
 
     default:
       reply = {
         type: "text",
         text: "event:postback"
       };
+      let result = client.replyMessage(event.replyToken, reply);
+      res.json(result);
   }
+  return;
+}
+
+
+//--------------------------------------------------------------------------------
+//  askQuestion
+//--------------------------------------------------------------------------------
+function askQuestion()
+{
+  //--------------------
+  //  今すぐ傘の用不要を聞く
+  //  デフォルトの地域設定をするかどうかを聞く
+  //--------------------
+  let reply = {  // Button Template Message
+    "type": "template",
+    "altText": "選択ボタン",
+    "template": {
+      "type": "buttons",
+      "thumbnailImageUrl":
+        "https://raw.githubusercontent.com/pollenjp/learning_linebot/feature/line-sdk/image/umbrella01.gif",
+      "imageAspectRatio": "rectangle",
+      "imageSize": "cover",
+      "imageBackgroundColor": "#FFFFFF",
+      "title": "できること",
+      "text": "以下の項目から選択してください。",
+      "actions": [
+        {
+          "type": "postback",
+          "label": "今すぐ傘の有無を調べます",
+          "data": "question=needUmbrella&action=yes"
+        },
+        {
+          "type": "postback",
+          "label": "デフォルト地域を設定・変更します",
+          "data": "question=setPlace&action=yes"
+        }
+      ]
+    }
+  };
+
   return reply;
 }
 
 
 //--------------------------------------------------------------------------------
-//  askWhetherToSettingDefaultPlace
+//  askSavePlace
 //--------------------------------------------------------------------------------
-function askWhetherToSettingDefaultPlace()
+async function askSavePlace(event, req, res)
 {
-  //--------------------
-  //  デフォルトの地域設定をするかどうかを聞く
-  //--------------------
-  var reply = {  // Button Template Message
+  let reply = {  // Button Template Message
     "type": "template",
-    "altText": "ask whether to setting a default place",
+    "altText": "選択ボタン",
     "template": {
       "type": "buttons",
-      "imageAspectRatio": "rectangle",
-      "title": "デフォルトの地域を設定しますか？",
-      "text": "次回から地域入力を省略することができます。",
+      "title": "地域保存",
+      "text": "地域を保存すると次回から入力を省略できます。",
       "actions": [
         {
           "type": "postback",
-          "label": "はい",
+          "label": "保存する",
           "data": "question=setPlace&action=yes"
         },
         {
           "type": "postback",
-          "label": "いいえ",
+          "label": "保存しない",
           "data": "question=setPlace&action=no"
         }
       ]
     }
   };
-  return reply;
+}
+
+
+//--------------------------------------------------------------------------------
+//  askRegions
+//--------------------------------------------------------------------------------
+async function askRegions()
+{
+  // Button Template Message
+  // Question "Which region in Japan"
+  let reply = [
+    {
+      // 1st Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+        "imageAspectRatio": "rectangle",
+        "imageSize": "cover",
+        "imageBackgroundColor": "#FFFFFF",
+        "title": "どこの地方ですか？",
+        "text": "選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "北海道・東北",
+            "data" : "question=region" + "&" + "region=HokkaidouTouhoku"
+          },
+          {
+            "type" : "postback",
+            "label": "関東",
+            "data" : "question=region" + "&" + "region=Kantou"
+          },
+          {
+            "type" : "postback",
+            "label": "中部",
+            "data" : "question=region" + "&" + "region=Chubu"
+          },
+          {
+            "type" : "postback",
+            "label": "近畿",
+            "data" : "question=region" + "&" + "region=Kinki"
+          }
+        ]
+      }
+    },
+    {
+      // 2nd Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "text": "上の項目か下の項目から選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "中国",
+            "data" : "question=region" + "&" + "region=Chugoku"
+          },
+          {
+            "type" : "postback",
+            "label": "四国",
+            "data" : "question=region" + "&" + "region=Shikoku"
+          },
+          {
+            "type" : "postback",
+            "label": "九州・沖縄",
+            "data" : "question=region" + "&" + "region=KyushuOkinawa"
+          }
+        ]
+      }
+    },
+  ];
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
+}
+
+
+//--------------------------------------------------------------------------------
+//  selectHokkaidouTouhoku
+//--------------------------------------------------------------------------------
+async function selectHokkaidouTouhoku(event, req, res)
+{
+  let reply = [
+    {
+      // 1st Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+        "imageAspectRatio": "rectangle",
+        "imageSize": "cover",
+        "imageBackgroundColor": "#FFFFFF",
+        "title": "どこの都道府県ですか？",
+        "text": "選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "北海道",
+            "data" : "question=prefecture" + "&" + "prefecture=Hokkaidou" + "&" + "capital=Sapporo"
+          },
+          {
+            "type" : "postback",
+            "label": "青森",
+            "data" : "question=prefecture" + "&" + "prefecture=Aomori" + "&" + "capital=Aomori"
+          },
+          {
+            "type" : "postback",
+            "label": "岩手",
+            "data" : "question=prefecture" + "&" + "prefecture=Iwate" + "&" + "capital=Morioka"
+          },
+          {
+            "type" : "postback",
+            "label": "宮城",
+            "data" : "question=prefecture" + "&" + "prefecture=Miyagi" + "&" + "capital=Sendai"
+          }
+        ]
+      }
+    },
+    {
+      // 2nd Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "text": "上の項目か下の項目から選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "秋田",
+            "data" : "question=prefecture" + "&" + "prefecture=Akita" + "&" + "capital=Akita"
+          },
+          {
+            "type" : "postback",
+            "label": "山形",
+            "data" : "question=prefecture" + "&" + "prefecture=Yamagata" + "&" + "capital=Yamagata"
+          },
+          {
+            "type" : "postback",
+            "label": "福島",
+            "data" : "question=prefecture" + "&" + "prefecture=Fukushima" + "&" + "capital=Fukushima"
+          }
+        ]
+      }
+    }
+  ];
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
+}
+
+
+//--------------------------------------------------------------------------------
+//  selectKantou
+//--------------------------------------------------------------------------------
+async function selectKantou(event, req, res)
+{
+  let reply = [
+    {
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+        "imageAspectRatio": "rectangle",
+        "imageSize": "cover",
+        "imageBackgroundColor": "#FFFFFF",
+        "title": "どこの都道府県ですか？",
+        "text": "選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "東京",
+            "data" : "question=prefecture" + "&" + "prefecture=Tokyo" + "&" + "capital=Tokyo"
+          },
+          {
+            "type" : "postback",
+            "label": "神奈川",
+            "data" : "question=prefecture" + "&" + "prefecture=kanagawa" + "&" + "capital=Yokohama"
+          },
+          {
+            "type" : "postback",
+            "label": "埼玉",
+            "data" : "question=prefecture" + "&" + "prefecture=Saitama" + "&" + "capital=Saitama"
+          }, 
+          {
+            "type" : "postback",
+            "label": "千葉",
+            "data" : "question=prefecture" + "&" + "prefecture=Chiba" + "&" + "capital=Chiba"
+          }
+        ]
+      }
+    },
+    {
+      // 2nd Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "text": "上の項目か下の項目から選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "茨城",
+            "data" : "question=prefecture" + "&" + "prefecture=Ibaraki" + "&" + "capital=Mito"
+          }, 
+          {
+            "type" : "postback",
+            "label": "群馬",
+            "data" : "question=prefecture" + "&" + "prefecture=Gunma" + "&" + "capital=Maebashi"
+          }, 
+          {
+            "type" : "postback",
+            "label": "栃木",
+            "data" : "question=prefecture" + "&" + "prefecture=Tochigi" + "&" + "capital=Utsunomiya"
+          }
+        ]
+      }
+    }
+  ];
+
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
+}
+
+
+//--------------------------------------------------------------------------------
+//  selectChubu
+//--------------------------------------------------------------------------------
+async function selectChubu(event, req, res)
+{
+  let reply = [
+    {
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+        "imageAspectRatio": "rectangle",
+        "imageSize": "cover",
+        "imageBackgroundColor": "#FFFFFF",
+        "title": "どこの都道府県ですか？",
+        "text": "選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "静岡",
+            "data" : "question=prefecture" + "&" + "prefecture=Shizuoka" + "&" + "capital=Shizuoka"
+          },
+          {
+            "type" : "postback",
+            "label": "愛知",
+            "data" : "question=prefecture" + "&" + "prefecture=Aichi" + "&" + "capital=Nagoya"
+          },
+          {
+            "type" : "postback",
+            "label": "岐阜",
+            "data" : "question=prefecture" + "&" + "prefecture=Gifu" + "&" + "capital=Gifu-shi"
+          }, 
+          {
+            "type" : "postback",
+            "label": "新潟",
+            "data" : "question=prefecture" + "&" + "prefecture=Niigata" + "&" + "capital=Niigata"
+          },
+        ]
+      }
+    },
+    {
+      // 2nd Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "text": "上の項目か下の項目から選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "富山",
+            "data" : "question=prefecture" + "&" + "prefecture=Toyama" + "&" + "capital=Toyama"
+          },
+          {
+            "type" : "postback",
+            "label": "石川",
+            "data" : "question=prefecture" + "&" + "prefecture=Ishikawa" + "&" + "capital=Kanazawa"
+          },
+          {
+            "type" : "postback",
+            "label": "福井",
+            "data" : "question=prefecture" + "&" + "prefecture=Fukui" + "&" + "capital=Fukui"
+          }
+        ]
+      }
+    }
+  ];
+
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
+}
+
+
+//--------------------------------------------------------------------------------
+//  selectKinki
+//--------------------------------------------------------------------------------
+async function selectKinki(event, req, res)
+{
+  let reply = [
+    { 
+      "type": "template", 
+      "altText": "This is a buttons template", 
+      "template": {
+        "type": "buttons", 
+        "thumbnailImageUrl": "https://example.com/bot/images/image.jpg", 
+        "imageAspectRatio": "rectangle", 
+        "imageSize": "cover", 
+        "imageBackgroundColor": "#FFFFFF", 
+        "title": "どこの都道府県ですか？", 
+        "text": "選択してください。", 
+        "actions": [ 
+          { 
+            "type" : "postback", 
+            "label": "兵庫", 
+            "data" : "question=prefecture" + "&" + "prefecture=Hyogo" + "&" + "capital=Cobe" 
+          }, 
+          { 
+            "type" : "postback", 
+            "label": "京都", 
+            "data" : "question=prefecture" + "&" + "prefecture=Kyoto" + "&" + "capital=Kyoto" 
+          }, 
+          { 
+            "type" : "postback", 
+            "label": "大阪", 
+            "data" : "question=prefecture" + "&" + "prefecture=Osaka" + "&" + "capital=Osaka" 
+          },
+          { 
+            "type" : "postback", 
+            "label": "和歌山", 
+            "data" : "question=prefecture" + "&" + "prefecture=Wakayama" + "&" + "capital=Wakayama" 
+          }
+        ] 
+      } 
+    },
+    {
+      // 2nd Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "text": "上の項目か下の項目から選択してください。",
+        "actions": [
+          { 
+            "type" : "postback", 
+            "label": "滋賀", 
+            "data" : "question=prefecture" + "&" + "prefecture=Shiga" + "&" + "capital=Otsu" 
+          },
+          { 
+            "type" : "postback", 
+            "label": "奈良", 
+            "data" : "question=prefecture" + "&" + "prefecture=Nara" + "&" + "capital=Nara" 
+          },
+          { 
+            "type" : "postback", 
+            "label": "三重", 
+            "data" : "question=prefecture" + "&" + "prefecture=Mie" + "&" + "capital=Tsu" 
+          }
+        ]
+      }
+    }
+  ];
+
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
+}
+
+
+//--------------------------------------------------------------------------------
+//  selectChugoku
+//--------------------------------------------------------------------------------
+async function selectChugoku(event, req, res)
+{
+  let reply = [
+    {
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+        "imageAspectRatio": "rectangle",
+        "imageSize": "cover",
+        "imageBackgroundColor": "#FFFFFF",
+        "title": "どこの都道府県ですか？",
+        "text": "選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "山口",
+            "data" : "question=prefecture" + "&" + "prefecture=Yamaguchi" + "&" + "capital=Yamaguchi"
+          },
+          {
+            "type" : "postback",
+            "label": "広島",
+            "data" : "question=prefecture" + "&" + "prefecture=Hiroshima" + "&" + "capital=Hiroshima"
+          },
+          {
+            "type" : "postback",
+            "label": "岡山",
+            "data" : "question=prefecture" + "&" + "prefecture=Okayama" + "&" + "capital=Okayama"
+          }
+        ]
+      }
+    },
+    {
+      // 2nd Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "text": "上の項目か下の項目から選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "島根",
+            "data" : "question=prefecture" + "&" + "prefecture=Shimane" + "&" + "capital=Matsue"
+          },
+          {
+            "type" : "postback",
+            "label": "鳥取",
+            "data" : "question=prefecture" + "&" + "prefecture=Tottori" + "&" + "capital=Tottori"
+          }
+        ]
+      }
+    }
+  ];
+
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
+}
+
+
+//--------------------------------------------------------------------------------
+//  selectShikoku
+//--------------------------------------------------------------------------------
+async function selectShikoku(event, req, res)
+{
+  let reply = {
+    "type": "template",
+    "altText": "This is a buttons template",
+    "template": {
+      "type": "buttons",
+      "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+      "imageAspectRatio": "rectangle",
+      "imageSize": "cover",
+      "imageBackgroundColor": "#FFFFFF",
+      "title": "どこの都道府県ですか？",
+      "text": "選択してください。",
+      "actions": [
+        {
+          "type" : "postback",
+          "label": "香川",
+          "data" : "question=prefecture" + "&" + "prefecture=kagawa" + "&" + "capital=Takamatsu"
+        },
+        {
+          "type" : "postback",
+          "label": "徳島",
+          "data" : "question=prefecture" + "&" + "prefecture=Tokushima" + "&" + "capital=Tokushima"
+        },
+        {
+          "type" : "postback",
+          "label": "愛媛",
+          "data" : "question=prefecture" + "&" + "prefecture=Ehime" + "&" + "capital=Matsuyama"
+        },
+        {
+          "type" : "postback",
+          "label": "高知",
+          "data" : "question=prefecture" + "&" + "prefecture=Kochi" + "&" + "capital=Kochi"
+        }
+      ]
+    }
+  };
+
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
+}
+
+
+//--------------------------------------------------------------------------------
+//  selectKyushuOkinawa
+//--------------------------------------------------------------------------------
+async function selectKyushuOkinawa(event, req, res)
+{
+  reply = [
+    {
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
+        "imageAspectRatio": "rectangle",
+        "imageSize": "cover",
+        "imageBackgroundColor": "#FFFFFF",
+        "title": "どこの都道府県ですか？",
+        "text": "選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "鹿児島",
+            "data" : "question=prefecture" + "&" + "prefecture=Kagoshima" + "&" + "capital=Kagoshima"
+          },
+          {
+            "type" : "postback",
+            "label": "熊本",
+            "data" : "question=prefecture" + "&" + "prefecture=Kumamoto" + "&" + "capital=Kumamoto"
+          },
+          {
+            "type" : "postback",
+            "label": "宮崎",
+            "data" : "question=prefecture" + "&" + "prefecture=Miyazaki" + "&" + "capital=Miyazaki"
+          },
+          {
+            "type" : "postback",
+            "label": "大分",
+            "data" : "question=prefecture" + "&" + "prefecture=Oita" + "&" + "capital=Oita"
+          }
+        ]
+      }
+    },
+    {
+      // 2nd Message
+      "type": "template",
+      "altText": "This is a buttons template",
+      "template": {
+        "type": "buttons",
+        "text": "上の項目か下の項目から選択してください。",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "福岡",
+            "data" : "question=prefecture" + "&" + "prefecture=Fukuoka" + "&" + "capital=Fukuoka"
+          },
+          {
+            "type" : "postback",
+            "label": "佐賀",
+            "data" : "question=prefecture" + "&" + "prefecture=Saga" + "&" + "capital=Saga"
+          },
+          {
+            "type" : "postback",
+            "label": "長崎",
+            "data" : "question=prefecture" + "&" + "prefecture=Ngasaki" + "&" + "capital=Nagasaki"
+          },
+          {
+            "type" : "postback",
+            "label": "沖縄",
+            "data" : "question=prefecture" + "&" + "prefecture=Okinawa" + "&" + "capital=Naha-shi"
+          }
+        ]
+      }
+    }
+  ];
+
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
+}
+
+
+//--------------------------------------------------------------------------------
+//  answerUmbrellaNecessity
+//--------------------------------------------------------------------------------
+async function answerUmbrellaNecessity(event, req, res)
+{
+  let reply = [];
+  let weatherInfo = "";
+  let sqlText = "";
+  let sqlValues = [];
+  let image_base_url = "https://raw.githubusercontent.com/pollenjp/learning_linebot/"
+    + "d47733b421ddb5b5a6165b168a2807d5e0ad2a21/"
+    + "image/";
+
+  sqlText = `SELECT savePlace FROM userinfo WHERE userid = $1`;
+  sqlValues = [ event.source.userId ];
+  let savePlace = await db.any( sqlText, sqlValues )
+    .catch( (err) => {
+      console.log("Error : ", err);
+    });
+
+  switch ( savePlace[0].savePlace ){
+    case 1:
+      sqlText = `UPDATE userinfo SET savePlace = 2 WHERE userid = $1`;
+      sqlValues = [ event.source.userId ];
+      db.any( sqlText, sqlValues )
+        .catch( (err) => {
+          console.log("Error : ", err);
+        });
+
+      sqlText = `UPDATE userinfo SET place = $1 WHERE userid = $2`;
+      sqlValues = [ postback_data_obj.capital, event.source.userId ];
+      db.any( sqlText, sqlValues )
+        .catch( (err) => {
+          console.log("Error : ", err);
+        });
+      // no break
+    case 2:
+      sqlText = `SELECT place FROM userinfo WHERE userid = $1`;
+      sqlValues = [ event.source.userId ];
+      let place = db.any( sqlText, sqlValues )
+        .catch( (err) => {
+          console.log("Error : ", err);
+        });
+      weatherInfo = getWeather.getWeatherInfo( place[0].place );
+      break;
+    case 0:
+    default:
+      weatherInfo = getWeather.getWeatherInfo(postback_data_obj.capital);
+  }
+
+  console.log(weatherInfo[0].icon);
+
+  reply.push({
+    type: "text",
+    text: weatherInfo[0].city_name + " : " + weatherInfo[0].forecast
+    // + ",url:" + image_base_url + weatherInfo[0].icon + ".png"
+  });
+  reply.push({
+    "type": "image",
+    "originalContentUrl": image_base_url + weatherInfo[0].icon + ".png",
+    "previewImageUrl"   : image_base_url + weatherInfo[0].icon + ".png"
+  });
+
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
 }
 
 
