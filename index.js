@@ -168,8 +168,8 @@ async function replyToPostbackEvent(event, req, res)
               console.log("Error : ", err);
             });
 
-          console.log(savePlace[0].savePlace);
-          if ( savePlace[0].savePlace == 2){
+          console.log(savePlace[0].saveplace);
+          if ( savePlace[0].saveplace == 2){
             askRegions(event, req, res);
           } else {
             askSavePlace(event, req, res);
@@ -904,7 +904,7 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
       console.log("Error : ", err);
     });
 
-  switch ( savePlace[0].savePlace ){
+  switch ( savePlace[0].saveplace ){
     case 1:
       sqlText = `UPDATE userinfo SET savePlace = 2 WHERE userid = $1`;
       sqlValues = [ event.source.userId ];
