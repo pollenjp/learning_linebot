@@ -115,3 +115,30 @@
 }
 ```
 
+## postgresql
+
+- `linebot`データベース作成
+
+```
+pguser01@raspberrypi:~ $ createdb linebot
+```
+
+- `linebot`データベースに接続
+
+```
+pguser01=> \c linebot 
+データベース "linebot" にユーザ"pguser01"として接続しました。
+```
+
+
+```
+CREATE TABLE userInfo (
+  userId    varchar(30)   PRIMARY KEY,    -- LINEユーザID
+  savePlace integer,                      -- 県を保存するかの選択
+  place     varchar(30),                  -- 県
+  getPush   integer                       -- 毎朝プッシュ通知を受け取るかどうか
+)
+```
+
+
+

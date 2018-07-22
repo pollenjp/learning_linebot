@@ -19,55 +19,103 @@ const config = {
 }
 
 
+//--------------------
+//  database
+//--------------------
+const pgp = require('pg-promise')({
+    // Initialization Options
+});
+const cn = 'postgres://pguser01:pguser01@pollenjp.com:55432/pguser01';
+const db = pgp(cn);
+
+
 //--------------------------------------------------------------------------------
 //  Main
 //--------------------------------------------------------------------------------
 const app = express();
 const client = new line.Client(config);
 
-app.post("/webhook", line.middleware(config),
-  function(req, res)
+app.post("/webhook", line.middleware(config), (req, res) => {
+  console.log("get");
+  // 各イベントに対して処理を実行
+  req.body.events.forEach( (event) => {
+    handleEvent(event, req, res);
+  });
+  //Promise
+  //  .all( req.body.events.map(handleEvent) )
+  //  .then( function(result){ res.json(result); } );
+});
+
+
+//----------------------------------------
+//  Listen Port
+//----------------------------------------
+const port = process.env.PORT || 3000;
+app.listen(port, function()
   {
-    console.log("get");
-    Promise
-      .all(req.body.events.map(handleEvent))
-      .then(function(result){ res.json(result); });
+    console.log("Listening on ${port}");
   }
 );
+
 
 
 //--------------------------------------------------------------------------------
 //  handleEvent
 //--------------------------------------------------------------------------------
-function handleEvent(event)
+async function handleEvent(event, req, res)
 {
-  console.log(event);
-  console.log(event.type);
-  console.log(event.timestamp);
-  console.log(event.source);
+  //----------------------------------------
+  //  Event
+  //----------------------------------------
+  //    source.userId
+  console.log("event\n", event, "\n");
+  console.log("event.type\n", event.type, "\n");
+  console.log("event.timestamp", event.timestamp, "\n");
+  console.log("event.source\n", event.source, "\n");
   //if (event.type !== "message" || event.message.type !== "text"){
   //  // ignore non-text-message event
   //  return Promise.resolve(null);
   //}
+  //
 
   //----------------------------------------
   // reply
   //----------------------------------------
   var reply;
   //--------------------
+  //  type : follow
   //  type : message
-  //--------------------
-  if (event.type == "message" && event.message.type == "text"){
-    reply = replyToMessageEvent(event);
-  }
-  //--------------------
   //  type : postback
   //--------------------
-  if (event.type == "postback"){
-    reply = replyToPostbackEvent(event);
+  switch ( event.type ){
+    case "follow": replyToFollowEvent(event, req, res); break;
+    case "message": replyToMessageEvent(event, req, res); break;
+    case "postback": replyToPostbackEvent(event, req, res); break;
+    default:
   }
+    result = client.replyMessage(event.replyToken, reply);
+    res.json(result);
+}
 
-  return client.replyMessage(event.replyToken, reply);
+
+//--------------------------------------------------------------------------------
+//  replyToFollowEvent
+//--------------------------------------------------------------------------------
+async function replyToFollowEvent(event, req, res)
+{
+  //----------------------------------------
+  //  register on database
+  //----------------------------------------
+  var sqlText = 'INSERT INTO userInfo(userId) VALUES($1);'
+  var sqlValues = [event.source.userId]
+  db.any(sqlText, sqlValues);
+
+  //----------------------------------------
+  //  reply message
+  //----------------------------------------
+  let reply = askWhetherToSettingDefaultPlace();
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
 }
 
 
@@ -112,12 +160,12 @@ function replyToMessageEvent(event)
           "type": "postback",
           "label": "はい",
           "data": "question=needUmbrella&action=yes"
-        },
-        {
-          "type": "postback",
-          "label": "いいえ",
-          "data": "question=needUmbrella&action=no"
         }
+        //{
+        //  "type": "postback",
+        //  "label": "いいえ",
+        //  "data": "question=needUmbrella&action=no"
+        //}
       ]
     }
   };
@@ -144,6 +192,29 @@ function replyToPostbackEvent(event)
       //  needUmbrella
       //------------------------------------------------------------
     case "needUmbrella":
+      switch (postback_data_obj.action){
+        case "yes":
+          // データベースを確認してデフォルト地域がなければ
+          // 地域を聞く.
+          sqlText = 'select * ';
+          pool.query( sqlText, sqlValues, (err, res) => {
+            if (err){
+              throw err;
+            }
+            console.log("DATABASE INSERT userId");
+          });
+          // if in database
+          //  reply the answer
+          // else
+          //  ask place
+          break;
+      }
+      break;
+
+      //------------------------------------------------------------
+      //  setPlace
+      //------------------------------------------------------------
+    case "setPlace":
       switch (postback_data_obj.action){
         case "yes":
           // Button Template Message
@@ -220,8 +291,9 @@ function replyToPostbackEvent(event)
       //------------------------------------------------------------
       //  Region
       //  TODO:
-      //    - 近畿地方
       //    - 中部地方の中央高知（アルプス？）
+      //      - 長野
+      //      - 山梨
       //------------------------------------------------------------
       switch (postback_data_obj.region){
           // Button Template Message
@@ -707,7 +779,42 @@ function replyToPostbackEvent(event)
 
 
 //--------------------------------------------------------------------------------
+//  askWhetherToSettingDefaultPlace
+//--------------------------------------------------------------------------------
+function askWhetherToSettingDefaultPlace()
+{
+  //--------------------
+  //  デフォルトの地域設定をするかどうかを聞く
+  //--------------------
+  var reply = {  // Button Template Message
+    "type": "template",
+    "altText": "ask whether to setting a default place",
+    "template": {
+      "type": "buttons",
+      "imageAspectRatio": "rectangle",
+      "title": "デフォルトの地域を設定しますか？",
+      "text": "次回から地域入力を省略することができます。",
+      "actions": [
+        {
+          "type": "postback",
+          "label": "はい",
+          "data": "question=setPlace&action=yes"
+        },
+        {
+          "type": "postback",
+          "label": "いいえ",
+          "data": "question=setPlace&action=no"
+        }
+      ]
+    }
+  };
+  return reply;
+}
+
+
+//--------------------------------------------------------------------------------
 //  queryStringToJSON
+//--------------------------------------------------------------------------------
 function queryStringToJSON(qs) {
   // reference
   //    Carlo G
@@ -734,14 +841,4 @@ function queryStringToJSON(qs) {
 
   return JSON.parse(JSON.stringify(result));
 };
-
-//--------------------------------------------------------------------------------
-//  Listen Port
-//--------------------------------------------------------------------------------
-const port = process.env.PORT || 3000;
-app.listen(port, function()
-  {
-    console.log("Listening on ${port}");
-  }
-);
 
