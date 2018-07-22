@@ -87,7 +87,6 @@ async function handleEvent(event, req, res)
   //----------------------------------------
   // reply
   //----------------------------------------
-  var reply;
   //--------------------
   //  type : follow
   //  type : message
@@ -129,7 +128,7 @@ async function replyToFollowEvent(event, req, res)
 //--------------------------------------------------------------------------------
 //  replyToMessageEvent
 //--------------------------------------------------------------------------------
-async function replyToMessageEvent(event)
+async function replyToMessageEvent(event, req, res)
 {
   let reply = askQuestion(event, req, res);
   let result = client.replyMessage(event.replyToken, reply);
