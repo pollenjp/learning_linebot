@@ -167,6 +167,7 @@ async function replyToPostbackEvent(event, req, res)
             .catch( (err) => {
               console.log("Error : ", err);
             });
+
           if ( savePlace[0].savePlace == 2){
             askRegions(event, req, res);
           } else {
@@ -314,6 +315,9 @@ async function askSavePlace(event, req, res)
       ]
     }
   };
+
+  let result = client.replyMessage(event.replyToken, reply);
+  res.json(result);
 }
 
 
@@ -388,6 +392,7 @@ async function askRegions()
       }
     },
   ];
+
   let result = client.replyMessage(event.replyToken, reply);
   res.json(result);
 }
