@@ -168,6 +168,7 @@ async function replyToPostbackEvent(event, req, res)
               console.log("Error : ", err);
             });
 
+          console.log(savePlace[0].savePlace);
           if ( savePlace[0].savePlace == 2){
             askRegions(event, req, res);
           } else {
