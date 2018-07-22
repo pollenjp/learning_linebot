@@ -168,6 +168,7 @@ async function replyToPostbackEvent(event, req, res)
               console.log("Error : ", err);
             });
 
+          console.log(savePlace);
           console.log(savePlace[0].saveplace);
           if ( savePlace[0].saveplace == 2){
             askRegions(event, req, res);
@@ -923,7 +924,7 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
     case 2:
       sqlText = `SELECT place FROM userinfo WHERE userid = $1`;
       sqlValues = [ event.source.userId ];
-      let place = db.any( sqlText, sqlValues )
+      let place = await db.any( sqlText, sqlValues )
         .catch( (err) => {
           console.log("Error : ", err);
         });
