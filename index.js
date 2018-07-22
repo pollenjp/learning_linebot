@@ -324,7 +324,7 @@ async function askSavePlace(event, req, res)
 //--------------------------------------------------------------------------------
 //  askRegions
 //--------------------------------------------------------------------------------
-async function askRegions()
+async function askRegions(event, req, res)
 {
   // Button Template Message
   // Question "Which region in Japan"
