@@ -8,8 +8,17 @@
 - LINE
   - https://developers.line.me/ja/docs/messaging-api/message-types/#video-messages
 
+## npm install
 
-# 課題
+```
+$ npm init
+$ npm install --save express
+$ npm install --save pg-promise
+$ npm install --save express
+```
+
+
+## 課題
 - 課題を以下のドライブにアップロードしてください。
   - ファイル名は「<地方・ローマ字>.txt（拡張子はなくても構わない）
   - https://drive.google.com/drive/folders/1iK9y598plXB38webVbOuxhMFB-p3v_vt?usp=sharing
@@ -137,7 +146,7 @@ CREATE TABLE userInfo (
   savePlace integer,                      -- 県を保存するかの選択
   place     varchar(30),                  -- 県
   getPush   integer                       -- 毎朝プッシュ通知を受け取るかどうか
-)
+);
 ```
 
 

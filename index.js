@@ -106,7 +106,7 @@ async function replyToFollowEvent(event, req, res)
   //----------------------------------------
   //  register on database
   //----------------------------------------
-  var sqlText = 'INSERT INTO userInfo(userId) VALUES($1);'
+  var sqlText = 'INSERT INTO userinfo(userId) VALUES($1);'
   var sqlValues = [event.source.userId]
   db.any(sqlText, sqlValues);
 
