@@ -966,7 +966,7 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
 
   reply.push({
     type: "text",
-    text: `$(eveningWeather.city_name)における$(eveningWeather.date)$(eveningWeather.time)の天気は$(eveningWeather.forecast)です。`
+    text: `${eveningWeather.city_name}における${eveningWeather.date}${eveningWeather.time}の天気は${eveningWeather.forecast}です。`
   });
   reply.push({
     "type": "image",
