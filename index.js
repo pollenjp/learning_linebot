@@ -956,16 +956,22 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
   }
 
   console.log(weatherInfo[0].icon);
+  let eveningWeather = {};
+  for (var i in weatherInfo) {
+    if ( weatherInfo[i].time == "18:00") {
+      eveningWeather = weatherInfo[i];
+      break;
+    }
+  }
 
   reply.push({
     type: "text",
-    text: weatherInfo[0].city_name + " : " + weatherInfo[0].forecast
-    // + ",url:" + image_base_url + weatherInfo[0].icon + ".png"
+    text: `$(eveningWeather.city_name)における$(eveningWeather.date)$(eveningWeather.time)の天気は$(eveningWeather.forecast)です。`
   });
   reply.push({
     "type": "image",
-    "originalContentUrl": image_base_url + weatherInfo[0].icon + ".png",
-    "previewImageUrl"   : image_base_url + weatherInfo[0].icon + ".png"
+    "originalContentUrl": image_base_url + eveningWeather.icon + ".png",
+    "previewImageUrl"   : image_base_url + eveningWeather.icon + ".png"
   });
 
   let result = client.replyMessage(event.replyToken, reply);
