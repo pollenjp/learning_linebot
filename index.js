@@ -120,7 +120,7 @@ async function replyToFollowEvent(event, req, res)
   //----------------------------------------
   //  reply message
   //----------------------------------------
-  let reply = eskQuestion();
+  let reply = askQuestion();
   let result = client.replyMessage(event.replyToken, reply);
   res.json(result);
 }
