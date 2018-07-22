@@ -109,7 +109,7 @@ async function replyToFollowEvent(event, req, res)
   //----------------------------------------
   //  register on database
   //----------------------------------------
-  var sqlText = 'INSERT INTO userinfo(userId) VALUES($1);'
+  var sqlText = 'INSERT INTO userinfo (userid) VALUES ($1);'
   var sqlValues = [event.source.userId]
   db.any(sqlText, sqlValues)
     .catch( (err) => {
@@ -171,7 +171,8 @@ async function replyToPostbackEvent(event, req, res)
           console.log(savePlace);
           console.log(savePlace[0].saveplace);
           if ( savePlace[0].saveplace == 2){
-            answerUmbrellaNecessity(event, req, res);
+            let postback_data_obj = {};
+            answerUmbrellaNecessity( postback_data_obj, event, req, res);
           } else {
             askSavePlace(event, req, res);
           }
