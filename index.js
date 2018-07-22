@@ -25,7 +25,13 @@ const config = {
 const pgp = require('pg-promise')({
     // Initialization Options
 });
-const cn = 'postgres://pguser01:pguser01@pollenjp.com:55432/pguser01';
+const cn = {
+      host     : 'pollenjp.com',
+      port     : 55432,
+      database : 'linebot',
+      user     : 'pguser01',
+      password : 'pguser01passwd'
+};
 const db = pgp(cn);
 
 
