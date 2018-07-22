@@ -141,11 +141,11 @@ pguser01=> \c linebot
 
 
 ```
-CREATE TABLE userInfo (
-  userId    varchar(30)   PRIMARY KEY,    -- LINEユーザID
-  savePlace integer,                      -- 県を保存するかの選択
+CREATE TABLE userinfo (
+  userid    varchar(50)   PRIMARY KEY,    -- LINEユーザID
+  saveplace integer,                      -- 県を保存するかの選択
   place     varchar(30),                  -- 県
-  getPush   integer                       -- 毎朝プッシュ通知を受け取るかどうか
+  getpush   integer                       -- 毎朝プッシュ通知を受け取るかどうか
 );
 ```
 
