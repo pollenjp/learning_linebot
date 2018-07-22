@@ -94,6 +94,7 @@ async function handleEvent(event, req, res)
   //--------------------
   switch ( event.type ){
     case "follow"   : replyToFollowEvent(event, req, res); break;
+    case "unfollow" : replyToUnfollowEvent(event, req, res); break;
     case "message"  : replyToMessageEvent(event, req, res); break;
     case "postback" : replyToPostbackEvent(event, req, res); break;
     default:
@@ -122,6 +123,24 @@ async function replyToFollowEvent(event, req, res)
   let reply = eskQuestion();
   let result = client.replyMessage(event.replyToken, reply);
   res.json(result);
+}
+
+
+//--------------------------------------------------------------------------------
+//  replyToUnfollowEvent
+//--------------------------------------------------------------------------------
+async function replyToUnfollowEvent(event, req, res)
+{
+  //----------------------------------------
+  //  register on database
+  //----------------------------------------
+  var sqlText = `DELETE FROM userinfo WHERE userid = $1;`;
+  var sqlValues = [event.source.userId]
+  db.any(sqlText, sqlValues)
+    .catch( (err) => {
+      console.log("Error (replyToUnfollowEvent) : \n", err);
+    });
+  return;
 }
 
 
