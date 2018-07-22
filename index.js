@@ -234,7 +234,7 @@ async function replyToPostbackEvent(event, req, res)
       //  Prefecture
       //------------------------------------------------------------
       console.log("prefecture");
-      answerUmbrellaNecessity(event, req, res);
+      answerUmbrellaNecessity(postback_data_obj, event, req, res);
       return;
 
     default:
@@ -886,7 +886,7 @@ async function selectKyushuOkinawa(event, req, res)
 //--------------------------------------------------------------------------------
 //  answerUmbrellaNecessity
 //--------------------------------------------------------------------------------
-async function answerUmbrellaNecessity(event, req, res)
+async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
 {
   let reply = [];
   let weatherInfo = "";
