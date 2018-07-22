@@ -272,12 +272,12 @@ function askQuestion()
       "actions": [
         {
           "type": "postback",
-          "label": "今すぐ傘の有無を調べます",
+          "label": "傘の要・不要を調べる",
           "data": "question=needUmbrella&action=yes"
         },
         {
           "type": "postback",
-          "label": "デフォルト地域を設定・変更します",
+          "label": "地域の設定・変更",
           "data": "question=setPlace&action=yes"
         }
       ]
