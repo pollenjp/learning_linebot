@@ -1043,7 +1043,7 @@ var capitalToJapanesePrefecture = [
   ["Nagano"      , "長野"],
   ["Yamanashi"   , "山梨"],
   // 近畿
-  ["Kobe        , "兵庫"],
+  ["Kobe"        , "兵庫"],
   ["Kyoto"       , "京都"],
   ["Osaka"       , "大阪"],
   ["Wakayama"    , "和歌山"],
