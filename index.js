@@ -119,7 +119,7 @@ async function replyToFollowEvent(event, req, res)
   //----------------------------------------
   //  reply message
   //----------------------------------------
-  let reply = askQuestion();
+  let reply = eskQuestion();
   let result = client.replyMessage(event.replyToken, reply);
   res.json(result);
 }
@@ -171,7 +171,7 @@ async function replyToPostbackEvent(event, req, res)
           console.log(savePlace);
           console.log(savePlace[0].saveplace);
           if ( savePlace[0].saveplace == 2){
-            askRegions(event, req, res);
+            answerUmbrellaNecessity(event, req, res);
           } else {
             askSavePlace(event, req, res);
           }
