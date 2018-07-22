@@ -584,7 +584,7 @@ async function selectChubu(event, req, res)
         "imageSize": "cover",
         "imageBackgroundColor": "#FFFFFF",
         "title": "どこの都道府県ですか？",
-        "text": "選択してください。",
+        "text": "選択肢１",
         "actions": [
           {
             "type" : "postback",
@@ -615,7 +615,7 @@ async function selectChubu(event, req, res)
       "altText": "This is a buttons template",
       "template": {
         "type": "buttons",
-        "text": "上の項目か下の項目から選択してください。",
+        "text": "選択肢２",
         "actions": [
           {
             "type" : "postback",
@@ -631,7 +631,28 @@ async function selectChubu(event, req, res)
             "type" : "postback",
             "label": "福井",
             "data" : "question=prefecture" + "&" + "prefecture=Fukui" + "&" + "capital=Fukui"
+          },
+          {
+            "type" : "postback",
+            "label": "福井",
+            "data" : "question=prefecture" + "&" + "prefecture=Nagano" + "&" + "capital=Nagano"
           }
+        ]
+      }
+    },
+    {
+      // 3rd Message
+      "type": "template",
+      "altText": "3rd selection",
+      "template": {
+        "type": "buttons",
+        "text": "選択肢３",
+        "actions": [
+          {
+            "type" : "postback",
+            "label": "富山",
+            "data" : "question=prefecture" + "&" + "prefecture=Yamanashi" + "&" + "capital=Yamanashi"
+          },
         ]
       }
     }
@@ -663,7 +684,7 @@ async function selectKinki(event, req, res)
           { 
             "type" : "postback", 
             "label": "兵庫", 
-            "data" : "question=prefecture" + "&" + "prefecture=Hyogo" + "&" + "capital=Cobe" 
+            "data" : "question=prefecture" + "&" + "prefecture=Hyogo" + "&" + "capital=Kobe" 
           }, 
           { 
             "type" : "postback", 
@@ -800,7 +821,7 @@ async function selectShikoku(event, req, res)
         {
           "type" : "postback",
           "label": "香川",
-          "data" : "question=prefecture" + "&" + "prefecture=kagawa" + "&" + "capital=Takamatsu"
+          "data" : "question=prefecture" + "&" + "prefecture=Kagawa" + "&" + "capital=Takamatsu"
         },
         {
           "type" : "postback",
@@ -815,7 +836,7 @@ async function selectShikoku(event, req, res)
         {
           "type" : "postback",
           "label": "高知",
-          "data" : "question=prefecture" + "&" + "prefecture=Kochi" + "&" + "capital=Kochi"
+          "data" : "question=prefecture" + "&" + "prefecture=Kochi" + "&" + "capital=Kochi-shi"
         }
       ]
     }
@@ -956,6 +977,8 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
   }
 
   console.log(weatherInfo[0].icon);
+
+  // get 18:00 weather
   let eveningWeather = {};
   for (var i in weatherInfo) {
     if ( weatherInfo[i].time == "18:00") {
@@ -964,9 +987,19 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
     }
   }
 
+  // get Japanese Prefecture name
+  let prefectureName = "";
+  for ( var i in capitalToJapanesePrefecture ) {
+    if ( eveningWeather.city_name == capitalToJapanesePrefecture[i][0] ) {
+      prefectureName = capitalToJapanesePrefecture[i][1];
+      console.log(prefectureName);
+      break;
+    }
+  }
+
   reply.push({
     type: "text",
-    text: `${eveningWeather.city_name}における${eveningWeather.date}${eveningWeather.time}の天気は${eveningWeather.forecast}です。`
+    text: `${prefectureName}における${eveningWeather.date}${eveningWeather.time}の天気は${eveningWeather.forecast}です。`
   });
   reply.push({
     "type": "image",
@@ -977,6 +1010,67 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
   let result = client.replyMessage(event.replyToken, reply);
   res.json(result);
 }
+
+
+//--------------------------------------------------------------------------------
+//  capitalToJapanesePrefecture
+//--------------------------------------------------------------------------------
+var capitalToJapanesePrefecture = [
+  // 北海道・東北
+  [Sapporo     , "北海道"],
+  [Aomori      , "青森"],
+  [Morioka     , "岩手"],
+  [Sendai      , "宮城"],
+  [Akita       , "秋田"],
+  [Yamagata    , "山形"],
+  [Fukushima   , "福島"],
+  // 関東
+  [Tokyo       , "東京"],
+  [Chiba       , "千葉"],
+  [Yokohama    , "神奈川"],
+  [Saitama     , "埼玉"],
+  [Utsunomiya  , "栃木"],
+  [Maebashi    , "群馬"],
+  [Mito        , "茨城"],
+  // 中部
+  [Shizuoka    , "静岡"],
+  [Gifu-shi    , "岐阜"],
+  [Nagoya      , "愛知"],
+  [Niigata     , "新潟"],
+  [Toyama      , "富山"],
+  [Kanazawa    , "石川"],
+  [Fukui       , "福井"],
+  [Nagano      , "長野"],
+  [Yamanashi   , "山梨"],
+  // 近畿
+  [Kobe        , "兵庫"],
+  [Kyoto       , "京都"],
+  [Osaka       , "大阪"],
+  [Wakayama    , "和歌山"],
+  [Otsu        , "滋賀"],
+  [Tsu         , "三重"],
+  [Nara        , "奈良"],
+  // 中国
+  [Yamaguchi   , "山口"],
+  [Hiroshima   , "広島"],
+  [Okayama     , "岡山"],
+  [Matsue      , "島根"],
+  [Tottori     , "鳥取"],
+  // 四国
+  [Takamatsu   , "香川"],
+  [Tokushima   , "徳島"],
+  [Matsuyama   , "愛媛"],
+  [Kochi-shi   , "高知"],
+  // 九州・沖縄
+  [Kagoshima   , "鹿児島"],
+  [Kumamoto    , "熊本"],
+  [Miyazaki    , "宮崎"],
+  [Oita        , "大分"],
+  [Fukuoka     , "福岡"],
+  [Saga        , "佐賀"],
+  [Nagasaki    , "長崎"],
+  [Okinawa     , "沖縄"],
+]
 
 
 //--------------------------------------------------------------------------------
@@ -1008,4 +1102,7 @@ function queryStringToJSON(qs) {
 
   return JSON.parse(JSON.stringify(result));
 };
+
+
+
 
