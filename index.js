@@ -131,7 +131,7 @@ async function replyToFollowEvent(event, req, res)
 //--------------------------------------------------------------------------------
 async function replyToMessageEvent(event)
 {
-  let reply = askQuestion(event.replyToken, reply);
+  let reply = askQuestion(event, req, res);
   let result = client.replyMessage(event.replyToken, reply);
   res.json(result);
 }
@@ -168,10 +168,10 @@ async function replyToPostbackEvent(event, req, res)
             .catch( (err) => {
               console.log("Error : ", err);
             });
-          if ( savePlace[0].savePlace != 2){
-            askSavePlace(event, req, res);
-          } else {
+          if ( savePlace[0].savePlace == 2){
             askRegions(event, req, res);
+          } else {
+            askSavePlace(event, req, res);
           }
           // if in database
           //  reply the answer
