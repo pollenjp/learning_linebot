@@ -142,9 +142,8 @@ async function replyToMessageEvent(event)
 //--------------------------------------------------------------------------------
 async function replyToPostbackEvent(event, req, res)
 {
-  var postback_data_obj = queryStringToJSON(event.postback.data);
+  let postback_data_obj = queryStringToJSON(event.postback.data);
   console.log(postback_data_obj);
-  var reply;
   //--------------------------------------------------------------------------------
   //  Switch
   //    - needUmbrella
@@ -172,7 +171,7 @@ async function replyToPostbackEvent(event, req, res)
           if ( savePlace[0].savePlace != 2){
             askSavePlace(event, req, res);
           } else {
-
+            askRegions(event, req, res);
           }
           // if in database
           //  reply the answer
@@ -188,13 +187,15 @@ async function replyToPostbackEvent(event, req, res)
       //------------------------------------------------------------
       switch (postback_data_obj.action){
         case "yes":
-          let sqlText = `UPDATE userinfo SET savePlace = $1 WHERE userid = $2`;
-          let sqlValues = [ 1, event.source.userId ];
+          let sqlText = `UPDATE userinfo SET savePlace = 1 WHERE userid = $1`;
+          let sqlValues = [ event.source.userId ];
           await db.any( sqlText, sqlValues )
             .catch( (err) => { console.log( "Error : ", err); } );
           askRegions(event, req, res);
           return;
         case "no":
+          askRegions(event, req, res);
+          return;
       }
       break;
 
@@ -237,7 +238,7 @@ async function replyToPostbackEvent(event, req, res)
       return;
 
     default:
-      reply = {
+      let reply = {
         type: "text",
         text: "event:postback"
       };
