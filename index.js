@@ -1001,10 +1001,10 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
   }
 
   // get Japanese weather name
-  let eveningWeatherJp = "";
+  let weatherJp = "";
   for ( var i in weatherToJapanese ){
     if ( eveningWeather.forecast == weatherToJapanese[i][0] ){
-      eveningWeatherJp = weatherToJapanese[i][1];
+      weatherJp = weatherToJapanese[i][1];
       break;
     }
   }
