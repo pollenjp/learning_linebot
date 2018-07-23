@@ -996,7 +996,7 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
       break;
     }
   }
-  if ( prefectureName = "" ){
+  if ( prefectureName == "" ){
     prefectureName = eveningWeather.city_name;
   }
 
