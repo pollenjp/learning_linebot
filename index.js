@@ -170,19 +170,23 @@ async function replyToPostbackEvent(event, req, res)
   switch (postback_data_obj.question){
 
     case "pushMessage":
-      let sqlText = `UPDATE userinfo SET pushmessage = 1  WHERE userid = $1`;
-      let sqlValues = [ event.source.userId ];
-      // savePlace (0: no, 1: want to save, 2: saved)
-      let savePlace = await db.any( sqlText, sqlValues)
-        .catch( (err) => {
-          console.log("Error : ", err);
-        });
-      let reply = {
-        type: "text",
-        text: "毎朝６時に通知されます。解除したい場合は一度ブロックしてからブロック解除をおねがいします。"
-      };
-      let result = client.replyMessage(event.replyToken, reply);
-      res.json(result);
+      switch (postback_data_obj.action){
+        case "yes":
+          let sqlText = `UPDATE userinfo SET pushmessage = 1  WHERE userid = $1`;
+          let sqlValues = [ event.source.userId ];
+          // savePlace (0: no, 1: want to save, 2: saved)
+          let savePlace = await db.any( sqlText, sqlValues)
+            .catch( (err) => {
+              console.log("Error : ", err);
+            });
+          let reply = {
+            type: "text",
+            text: "毎朝６時に通知されます。解除したい場合は一度ブロックしてからブロック解除をおねがいします。"
+          };
+          let result = client.replyMessage(event.replyToken, reply);
+          res.json(result);
+          break;
+      }
       break;
     case "needUmbrella":
       //------------------------------------------------------------
