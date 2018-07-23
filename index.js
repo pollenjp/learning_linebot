@@ -1021,10 +1021,10 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
     originalContentUrl : image_base_url + eveningWeather.icon + ".png",
     previewImageUrl    : image_base_url + eveningWeather.icon + ".png"
   });
-  reply.push({
-    type: "text",
-    text: 
-  });
+  //reply.push({
+  //  type: "text",
+  //  text: 
+  //});
 
   let result = client.replyMessage(event.replyToken, reply);
   res.json(result);
