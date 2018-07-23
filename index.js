@@ -996,15 +996,34 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
       break;
     }
   }
+  if ( prefectureName = "" ){
+    prefectureName = eveningWeather.city_name;
+  }
+
+  // get Japanese weather name
+  let eveningWeatherJp = "";
+  for ( var i in weatherToJapanese ){
+    if ( eveningWeather.forecast == weatherToJapanese[i][0] ){
+      eveningWeatherJp = weatherToJapanese[i][1];
+      break;
+    }
+  }
+  if ( weatherJp == "" ){
+      weatherJp = eveningWeather.forecast;
+  }
 
   reply.push({
     type: "text",
-    text: `${prefectureName}における${eveningWeather.date}${eveningWeather.time}の天気は${eveningWeather.forecast}です。`
+    text: `${prefectureName}における${eveningWeather.date}${eveningWeather.time}の天気は${weatherJp}です。`
   });
   reply.push({
-    "type": "image",
-    "originalContentUrl": image_base_url + eveningWeather.icon + ".png",
-    "previewImageUrl"   : image_base_url + eveningWeather.icon + ".png"
+    type: "image",
+    originalContentUrl : image_base_url + eveningWeather.icon + ".png",
+    previewImageUrl    : image_base_url + eveningWeather.icon + ".png"
+  });
+  reply.push({
+    type: "text",
+    text: 
   });
 
   let result = client.replyMessage(event.replyToken, reply);
@@ -1015,7 +1034,7 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
 //--------------------------------------------------------------------------------
 //  capitalToJapanesePrefecture
 //--------------------------------------------------------------------------------
-var capitalToJapanesePrefecture = [
+const capitalToJapanesePrefecture = [
   // 北海道・東北
   ["Sapporo"     , "北海道"],
   ["Aomori"      , "青森"],
@@ -1071,6 +1090,20 @@ var capitalToJapanesePrefecture = [
   ["Nagasaki"    , "長崎"],
   ["Okinawa"     , "沖縄"],
 ]
+
+
+//--------------------------------------------------------------------------------
+//  weatherToJapanese
+//--------------------------------------------------------------------------------
+const weatherToJapanese = [
+  ["Thunderstorm"   , "雷雨"],
+  ["Drizzle"        , "霧雨"],
+  ["Rain"           , "雨"],
+  ["Snow"           , "雪"],
+  //["Atmosphere"     , ""],
+  ["Clear"          , "快晴"],
+  ["Clouds"         , "曇り"],
+];
 
 
 //--------------------------------------------------------------------------------
