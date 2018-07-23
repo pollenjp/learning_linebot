@@ -1021,10 +1021,23 @@ async function answerUmbrellaNecessity(postback_data_obj, event, req, res)
     originalContentUrl : image_base_url + eveningWeather.icon + ".png",
     previewImageUrl    : image_base_url + eveningWeather.icon + ".png"
   });
-  //reply.push({
-  //  type: "text",
-  //  text: 
-  //});
+
+
+  let umbrellaMessage = "";
+  switch ( eveningWeather.forecast ) {
+    case "Clear":
+
+    case "Clouds":
+      umbrellaMessage = `傘を持っていく必要は無いと思われます。`
+      break
+    default:
+      umbrellaMessage = `傘を持って行ったほうがいいかもしれません。`
+  }
+
+  reply.push({
+    type: "text",
+    text: umbrellaMessage
+  });
 
   let result = client.replyMessage(event.replyToken, reply);
   res.json(result);
